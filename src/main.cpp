@@ -1,7 +1,10 @@
+#include <vcruntime.h>
 #include <cstdlib>
 #include <random>
 #include <vector>
+#include "boid/boid.hpp"
 #include "glm/fwd.hpp"
+#include "glm/glm.hpp"
 #include "imgui.h"
 #include "p6/p6.h"
 
@@ -33,6 +36,14 @@ int main(int argc, char* argv[])
         directionSquare[i] = glm::vec2((distribution(gen) > 0) ? 1 : -1, (distribution(gen) > 0) ? 1 : -1);
     }
 
+    // Boids test
+    // TODO(Aurore): maybe not init there
+    std::vector<Boid> allBoids;
+    for (size_t i = 0; i < nbSquare; ++i)
+    {
+        allBoids.emplace_back(glm::vec3(coordSquare[i], 0), p6::Radius(0.1f));
+    }
+
     // Actual app
     auto ctx = p6::Context{{.title = "Projecto con Olivia"}};
     ctx.maximize_window();
@@ -54,11 +65,15 @@ int main(int argc, char* argv[])
 
         for (size_t i = 0; i < nbSquare; ++i)
         {
-            coordSquare[i] += directionSquare[i] * speed / 100.f;
-            ctx.square(
-                p6::Center{coordSquare[i]},
-                p6::Radius{0.1f}
-            );
+            // Boids update position and draw
+            allBoids[i].updateCenter(glm::vec3(directionSquare[i], 0), speed);
+            allBoids[i].draw(ctx);
+
+            // coordSquare[i] += directionSquare[i] * speed / 100.f;
+            // ctx.square(
+            //     p6::Center{coordSquare[i]},
+            //     p6::Radius{0.1f}
+            // );
         }
     };
 
