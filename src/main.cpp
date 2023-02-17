@@ -1,4 +1,3 @@
-#include <vcruntime.h>
 #include <cstdlib>
 #include <random>
 #include <vector>
