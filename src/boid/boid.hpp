@@ -13,16 +13,15 @@ private:
 
     p6::Rotation m_rotation;
 
-    // std::vector<glm::vec3> coordPointsTriangle{3};
-    // std::array<glm::vec3, 3> coordPointsTriangle;
-
 public:
     // Boid();
-    Boid(glm::vec3 center, p6::Radius radius);
+    Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
 
     ~Boid() = default;
 
     void draw(p6::Context& ctx);
 
-    void updateCenter(glm::vec3 move, float speed);
+    void updateCenter(float speed);
+
+    void updateDir(float speed, p6::Angle angle);
 };

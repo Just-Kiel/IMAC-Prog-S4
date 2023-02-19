@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
     }
 
     // Squares infos
-    size_t nbSquare = 100;
-    float  speed    = 0.001f;
+    int   nbSquare = 100;
+    float speed    = 0.001f;
 
     std::vector<glm::vec2>                coordSquare(nbSquare);
     std::vector<glm::vec2>                directionSquare(nbSquare);
@@ -38,9 +38,10 @@ int main(int argc, char* argv[])
     // Boids test
     // TODO(Aurore): maybe not init there
     std::vector<Boid> allBoids;
+
     for (size_t i = 0; i < nbSquare; ++i)
     {
-        allBoids.emplace_back(glm::vec3(coordSquare[i], 0), p6::Radius(0.1f));
+        allBoids.emplace_back(glm::vec3(coordSquare[i], 0), p6::Radius(0.1f), static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen)));
     }
 
     // Actual app
@@ -50,29 +51,40 @@ int main(int argc, char* argv[])
     // ImGui informations
     ctx.imgui = [&]() {
         // Show a simple window
-        ImGui::Begin("Ploup");
-        ImGui::SliderFloat("Square speed", &speed, 0.f, 1.f);
+        ImGui::Begin("Boids parameters");
+        ImGui::SliderFloat("Boids speed", &speed, 0.f, 2.f);
+        ImGui::SliderInt("Boids number", &nbSquare, 0, 500);
         ImGui::End();
         // Show the official ImGui demo window
         // It is very useful to discover all the widgets available in ImGui
-        ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
     };
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
         ctx.background(p6::NamedColor::Blue);
 
-        for (size_t i = 0; i < nbSquare; ++i)
+        if (nbSquare != allBoids.size())
         {
-            // Boids update position and draw
-            allBoids[i].updateCenter(glm::vec3(directionSquare[i], 0), speed);
-            allBoids[i].draw(ctx);
+            if (nbSquare > allBoids.size())
+            {
+                allBoids.emplace_back(glm::vec3(distribution(gen) * 2.0f, distribution(gen), 0), p6::Radius(0.1f), static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen)));
+            }
+            else
+            {
+                allBoids.pop_back();
+            }
+        }
 
-            // coordSquare[i] += directionSquare[i] * speed / 100.f;
-            // ctx.square(
-            //     p6::Center{coordSquare[i]},
-            //     p6::Radius{0.1f}
-            // );
+        for (auto& boid : allBoids)
+        {
+            boid.updateCenter(speed);
+            // boid.updateDir(speed, static_cast<p6::Angle>(0.05_radians * p6::PI * distribution(gen)));
+        }
+
+        for (auto& boid : allBoids)
+        {
+            boid.draw(ctx);
         }
     };
 
