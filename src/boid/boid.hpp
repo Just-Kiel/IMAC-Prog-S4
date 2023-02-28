@@ -13,6 +13,8 @@ private:
 
     p6::Rotation m_rotation;
 
+    glm::vec3 m_direction;
+
 public:
     // Boid();
     Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
@@ -21,7 +23,11 @@ public:
 
     void draw(p6::Context& ctx);
 
-    void updateCenter(float speed);
+    void updateCenter(float speed, const std::vector<Boid>& neighbors);
 
     void updateDir(float speed, p6::Angle angle);
+
+    glm::vec3 separation(const std::vector<Boid>& neighbors);
+
+    float distance(const Boid& anotherBoid);
 };

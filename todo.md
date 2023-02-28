@@ -6,7 +6,7 @@
     - [ ] Les faire respawn de manière visible
     - [ ] Les faire éviter les bords (plus difficile sur le sujet)
 - [ ] Comportements :
-    - [ ] Séparation
+    - [x] Séparation
     - [ ] Alignement
     - [ ] Cohésion
 - [ ] Utiliser ImGui pour avoir des paramètres slidables

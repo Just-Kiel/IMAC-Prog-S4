@@ -41,7 +41,11 @@ int main(int argc, char* argv[])
 
     for (size_t i = 0; i < nbSquare; ++i)
     {
-        allBoids.emplace_back(glm::vec3(coordSquare[i], 0), p6::Radius(0.1f), static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen)));
+        allBoids.emplace_back(
+            glm::vec3(coordSquare[i], 0),
+            p6::Radius(0.1f),
+            static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen))
+        );
     }
 
     // Actual app
@@ -78,7 +82,7 @@ int main(int argc, char* argv[])
 
         for (auto& boid : allBoids)
         {
-            boid.updateCenter(speed);
+            boid.updateCenter(speed, allBoids);
             // boid.updateDir(speed, static_cast<p6::Angle>(0.05_radians * p6::PI * distribution(gen)));
         }
 
@@ -86,6 +90,8 @@ int main(int argc, char* argv[])
         {
             boid.draw(ctx);
         }
+
+        // allBoids[0].separation(allBoids);
     };
 
     // Should be done last. It starts the infinite loop.
