@@ -1,5 +1,6 @@
 #include "boid.hpp"
 #include <vector>
+#include "detections/detections.hpp"
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtx/norm.hpp"
@@ -72,10 +73,52 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
     {
         total /= count;
     }
+    // else
+    // {
+    //     total = glm::vec3(p6::rotated_by(p6::Angle(m_direction), glm::vec2(1., 0.)), 0.);
+    // }
     return total;
 }
 
 float Boid::distance(const Boid& anotherBoid)
 {
     return glm::distance2(this->centeredCoord, anotherBoid.centeredCoord);
+}
+
+// TODO(Aurore): voir si le code est le meme que avoid walls
+void Boid::avoidObstacles()
+{
+    // Avoid going outside of window
+    // Look forward head at a set distance
+    // return other direction if there is something
+}
+
+void Boid::avoidWalls(p6::Context& ctx)
+{
+    // Avoid going outside of window
+    // Look forward head at a set distance
+    // return other direction if there is something
+
+    // Min - max x = -ctx.aspect_ratio()/+ctx.aspect_ratio()
+    // Min - max y = -1/1
+    glm::vec3 frontDetection = (glm::normalize(m_direction) / 2.f) + centeredCoord;
+    glm::vec3 rightDetection = (glm::normalize(glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 45_degrees, glm::vec2(1., 0.)), 0.))) + centeredCoord;
+
+    // Y detection
+    avoidUpWall(*this, frontDetection, rightDetection);
+    avoidDownWall(*this, frontDetection, rightDetection);
+
+    // X detection
+    avoidLeftWall(*this, frontDetection, rightDetection, ctx);
+    avoidRightWall(*this, frontDetection, rightDetection, ctx);
+}
+
+void Boid::rotateLeft()
+{
+    m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) - 15_degrees, glm::vec2(1., 0.)), 0.);
+}
+
+void Boid::rotateRight()
+{
+    m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 15_degrees, glm::vec2(1., 0.)), 0.);
 }

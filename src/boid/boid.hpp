@@ -30,4 +30,12 @@ public:
     glm::vec3 separation(const std::vector<Boid>& neighbors);
 
     float distance(const Boid& anotherBoid);
+
+    void avoidObstacles();
+
+    void avoidWalls(p6::Context& ctx);
+
+    void rotateLeft();
+
+    void rotateRight();
 };

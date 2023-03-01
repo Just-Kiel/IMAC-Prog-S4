@@ -2,9 +2,9 @@
 
 - [x] Faire des triangles (hihi) pour savoir dans quelle direction ils vont (penser qu'ils doivent se baser sur la coordonnée centrée)
 - [x] Les faire bouger dans une direction random (ils gardent une translation et modifie juste leur rotation)
-- [ ] Les contraindre à ce qu'ils restent visibles
-    - [ ] Les faire respawn de manière visible
-    - [ ] Les faire éviter les bords (plus difficile sur le sujet)
+- [x] Les contraindre à ce qu'ils restent visibles
+    - [x] Les faire respawn de manière visible
+    - [x] Les faire éviter les bords (plus difficile sur le sujet)
 - [ ] Comportements :
     - [x] Séparation
     - [ ] Alignement
@@ -12,7 +12,7 @@
 - [ ] Utiliser ImGui pour avoir des paramètres slidables
     - [x] Vitesse des boids
     - [x] Nombre de boids
-- [ ] Gérer de meilleure façon les neighbors de boids
+- [ ] Gérer de meilleure façon les neighbors de boids (facultatif selon Jules)
 
 
 - [ ] Penser à passer de la 2D à la 3D
