@@ -12,6 +12,7 @@
 - [ ] Utiliser ImGui pour avoir des paramètres slidables
     - [x] Vitesse des boids
     - [x] Nombre de boids
+- [ ] Gérer de meilleure façon les neighbors de boids
 
 
 - [ ] Penser à passer de la 2D à la 3D

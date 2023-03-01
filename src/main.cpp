@@ -59,9 +59,6 @@ int main(int argc, char* argv[])
         ImGui::SliderFloat("Boids speed", &speed, 0.f, 2.f);
         ImGui::SliderInt("Boids number", &nbSquare, 0, 500);
         ImGui::End();
-        // Show the official ImGui demo window
-        // It is very useful to discover all the widgets available in ImGui
-        // ImGui::ShowDemoWindow();
     };
 
     // Declare your infinite update loop.
@@ -90,8 +87,6 @@ int main(int argc, char* argv[])
         {
             boid.draw(ctx);
         }
-
-        // allBoids[0].separation(allBoids);
     };
 
     // Should be done last. It starts the infinite loop.
