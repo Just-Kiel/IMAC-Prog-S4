@@ -27,6 +27,9 @@ void Boid::draw(p6::Context& ctx)
 
 void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
 {
+    // Add cohesion process
+    // m_direction += this->cohesion(neighbors);
+
     // Add separation process
     m_direction += this->separation(neighbors) * speed;
 
@@ -122,6 +125,23 @@ glm::vec3 Boid::alignment(const std::vector<Boid>& neighbors)
 float Boid::distance(const Boid& anotherBoid)
 {
     return glm::distance2(this->centeredCoord, anotherBoid.centeredCoord);
+}
+
+glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
+{
+    glm::vec3 averagePos = glm::vec3(0, 0, 0);
+    for (auto& boid : neighbors)
+    {
+        if (&boid != this)
+        {
+            averagePos += boid.centeredCoord;
+        }
+    }
+    averagePos = glm::vec3(averagePos.x / (neighbors.size() - 1), averagePos.y / (neighbors.size() - 1), averagePos.z / (neighbors.size() - 1));
+
+    glm::vec3 distancePos = averagePos - this->centeredCoord;
+
+    return distancePos;
 }
 
 // TODO(Aurore): voir si le code est le meme que avoid walls

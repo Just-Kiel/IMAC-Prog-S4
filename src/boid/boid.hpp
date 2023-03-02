@@ -29,6 +29,7 @@ public:
 
     glm::vec3 separation(const std::vector<Boid>& neighbors);
     glm::vec3 alignment(const std::vector<Boid>& neighbors);
+    glm::vec3 cohesion(const std::vector<Boid>& neighbors);
 
     float distance(const Boid& anotherBoid);
 
