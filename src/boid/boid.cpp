@@ -30,6 +30,12 @@ void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
     // Add separation process
     m_direction += this->separation(neighbors) * speed;
 
+    // Add alignment process
+    m_direction += this->alignment(neighbors) * speed;
+
+    // Limit the speed
+    m_direction = glm::normalize(m_direction);
+
     // glm::vec3 move = glm::vec3(p6::rotated_by(m_rotation, glm::vec2(1., 0.)), 0.);
     centeredCoord += m_direction * speed / 100.f;
 }
@@ -77,6 +83,39 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
     // {
     //     total = glm::vec3(p6::rotated_by(p6::Angle(m_direction), glm::vec2(1., 0.)), 0.);
     // }
+    return total;
+}
+
+glm::vec3 Boid::alignment(const std::vector<Boid>& neighbors)
+{
+    float distanceOfVision = 0.2f;
+
+    // Count of boids to close from current boid
+    size_t    count = 0;
+    glm::vec3 total = glm::vec3(0, 0, 0);
+
+    // Check for every boids if its to close
+    for (auto& boid : neighbors)
+    {
+        if (&boid != this)
+        {
+            // Calculate distance
+            float distance = this->distance(boid);
+
+            if (distance < distanceOfVision)
+            {
+                total += boid.m_direction;
+                count++;
+            }
+        }
+    }
+
+    if (count != 0)
+    {
+        total /= count;
+        total = glm::normalize(total);
+    }
+
     return total;
 }
 

@@ -28,6 +28,7 @@ public:
     void updateDir(float speed, p6::Angle angle);
 
     glm::vec3 separation(const std::vector<Boid>& neighbors);
+    glm::vec3 alignment(const std::vector<Boid>& neighbors);
 
     float distance(const Boid& anotherBoid);
 

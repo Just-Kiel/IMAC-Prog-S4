@@ -7,7 +7,7 @@
     - [x] Les faire éviter les bords (plus difficile sur le sujet)
 - [ ] Comportements :
     - [x] Séparation
-    - [ ] Alignement
+    - [x] Alignement
     - [ ] Cohésion
 - [ ] Utiliser ImGui pour avoir des paramètres slidables
     - [x] Vitesse des boids
