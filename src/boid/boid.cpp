@@ -28,7 +28,7 @@ void Boid::draw(p6::Context& ctx)
 void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
 {
     // Add cohesion process
-    // m_direction += this->cohesion(neighbors);
+    m_direction += this->cohesion(neighbors);
 
     // Add separation process
     m_direction += this->separation(neighbors) * speed;
@@ -51,7 +51,7 @@ void Boid::updateDir(float speed, p6::Angle angle)
 glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
 {
     // TODO(Aurore): max distance à déterminer
-    float maxDistance = 0.03f;
+    float maxDistance = 0.04f;
 
     // Count of boids to close from current boid
     size_t    count = 0;
@@ -129,15 +129,32 @@ float Boid::distance(const Boid& anotherBoid)
 
 glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
 {
+    float distanceAttraction = 0.5f;
+
+    // Count of boids to close from current boid
+    size_t count = 0;
+
     glm::vec3 averagePos = glm::vec3(0, 0, 0);
     for (auto& boid : neighbors)
     {
         if (&boid != this)
         {
-            averagePos += boid.centeredCoord;
+            // Calculate distance
+            float distance = this->distance(boid);
+
+            if (distance < distanceAttraction)
+            {
+                averagePos += boid.centeredCoord;
+                count++;
+            }
         }
     }
-    averagePos = glm::vec3(averagePos.x / (neighbors.size() - 1), averagePos.y / (neighbors.size() - 1), averagePos.z / (neighbors.size() - 1));
+
+    if (count != 0)
+    {
+        averagePos /= count;
+        averagePos = glm::normalize(averagePos);
+    }
 
     glm::vec3 distancePos = averagePos - this->centeredCoord;
 
