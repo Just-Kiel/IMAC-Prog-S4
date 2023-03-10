@@ -28,7 +28,7 @@ void Boid::draw(p6::Context& ctx)
 void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
 {
     // Add cohesion process
-    m_direction += this->cohesion(neighbors);
+    m_direction += this->cohesion(neighbors) / 4.f;
 
     // Add separation process
     m_direction += this->separation(neighbors) * speed;
