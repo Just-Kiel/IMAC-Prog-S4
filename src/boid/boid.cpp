@@ -16,6 +16,11 @@ Boid::Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation)
     m_direction = glm::vec3(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.);
 };
 
+void Boid::setForces(Forces forces)
+{
+    m_forces = forces;
+}
+
 void Boid::draw(p6::Context& ctx)
 {
     ctx.equilateral_triangle(
@@ -28,13 +33,13 @@ void Boid::draw(p6::Context& ctx)
 void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
 {
     // Add cohesion process
-    m_direction += this->cohesion(neighbors) / 4.f;
+    m_direction += this->cohesion(neighbors) * m_forces.m_cohesionForce * speed;
 
     // Add separation process
-    m_direction += this->separation(neighbors) * speed;
+    m_direction += this->separation(neighbors) * speed * m_forces.m_separationForce;
 
     // Add alignment process
-    m_direction += this->alignment(neighbors) * speed;
+    m_direction += this->alignment(neighbors) * speed * m_forces.m_alignmentForce;
 
     // Limit the speed
     m_direction = glm::normalize(m_direction);
@@ -51,7 +56,7 @@ void Boid::updateDir(float speed, p6::Angle angle)
 glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
 {
     // TODO(Aurore): max distance à déterminer
-    float maxDistance = 0.04f;
+    float maxDistance = m_radius.value / 2.f;
 
     // Count of boids to close from current boid
     size_t    count = 0;
@@ -91,7 +96,7 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
 
 glm::vec3 Boid::alignment(const std::vector<Boid>& neighbors)
 {
-    float distanceOfVision = 0.2f;
+    float distanceOfVision = m_radius.value * 2.f;
 
     // Count of boids to close from current boid
     size_t    count = 0;
@@ -122,14 +127,14 @@ glm::vec3 Boid::alignment(const std::vector<Boid>& neighbors)
     return total;
 }
 
-float Boid::distance(const Boid& anotherBoid)
+float Boid::distance(const Boid& anotherBoid) const
 {
     return glm::distance2(this->centeredCoord, anotherBoid.centeredCoord);
 }
 
 glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
 {
-    float distanceAttraction = 0.5f;
+    float distanceAttraction = m_radius.value * 5.f;
 
     // Count of boids to close from current boid
     size_t count = 0;
