@@ -5,11 +5,11 @@
 - [x] Les contraindre à ce qu'ils restent visibles
     - [x] Les faire respawn de manière visible
     - [x] Les faire éviter les bords (plus difficile sur le sujet)
-- [ ] Comportements :
+- [x] Comportements :
     - [x] Séparation
     - [x] Alignement
-    - [ ] Cohésion
-- [ ] Utiliser ImGui pour avoir des paramètres slidables
+    - [x] Cohésion
+- [x] Utiliser ImGui pour avoir des paramètres slidables
     - [x] Vitesse des boids
     - [x] Nombre de boids
 - [ ] Gérer de meilleure façon les neighbors de boids (facultatif selon Jules)

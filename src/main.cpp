@@ -8,6 +8,7 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "imgui.h"
+#include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT
@@ -61,6 +62,9 @@ int main(int argc, char* argv[])
     std::chrono::duration<double> elapsed_update_seconds;
     std::chrono::duration<double> elapsed_draw_seconds;
 
+    // Obstacles
+    std::vector<Obstacle> allObstacles;
+
     // ImGui informations
     ctx.imgui = [&]() {
         // Show a simple window
@@ -107,6 +111,12 @@ int main(int argc, char* argv[])
                 }
             }
         }
+
+        // Obstacles
+        if (ImGui::Button("Clear Obstacles"))
+        {
+            allObstacles.clear();
+        }
         ImGui::End();
     };
 
@@ -131,8 +141,20 @@ int main(int argc, char* argv[])
             boid.draw(ctx);
         }
         elapsed_draw_seconds = std::chrono::system_clock::now() - start;
-    };
 
+        for (auto& obstacle : allObstacles)
+        {
+            obstacle.draw(ctx);
+        }
+    };
+    // Mouse
+    ctx.mouse_pressed = [&](p6::MouseButton button) {
+        if (button.button == p6::Button::Left)
+        {
+            std::cout << "x = " << ctx.mouse()[0] << " y = " << ctx.mouse()[1] << std::endl;
+            allObstacles.emplace_back(button.position.x, button.position.y, p6::Radius{0.03f});
+        }
+    };
     // Should be done last. It starts the infinite loop.
     ctx.start();
 }
