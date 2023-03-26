@@ -10,9 +10,7 @@ class Boid {
 private:
     glm::vec3 centeredCoord{};
 
-    p6::Radius m_radius;
-
-    p6::Rotation m_rotation;
+    float m_radius;
 
     glm::vec3 m_direction;
 
@@ -20,19 +18,17 @@ private:
 
 public:
     // Boid();
-    Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
+    // Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
 
     ~Boid() = default;
 
-    inline float radius() const { return m_radius.value; }
+    inline float radius() const { return m_radius; }
 
     void setForces(Forces forces);
 
     void draw(p6::Context& ctx);
 
     void updateCenter(float speed, const std::vector<Boid>& neighbors);
-
-    void updateDir(float speed, p6::Angle angle);
 
     glm::vec3 separation(const std::vector<Boid>& neighbors);
     glm::vec3 alignment(const std::vector<Boid>& neighbors);

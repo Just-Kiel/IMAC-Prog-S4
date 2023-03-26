@@ -10,8 +10,11 @@
 
 //     };
 
-Boid::Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation)
-    : centeredCoord(center), m_radius(radius), m_rotation(rotation)
+// Boid::Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation)
+//     : centeredCoord(center), m_radius(radius), m_rotation(rotation)
+// {
+//     m_direction = glm::vec3(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.);
+// };
 {
     m_direction = glm::vec3(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.);
 };
@@ -48,15 +51,10 @@ void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
     centeredCoord += m_direction * speed / 100.f;
 }
 
-void Boid::updateDir(float speed, p6::Angle angle)
-{
-    m_rotation += angle * speed;
-}
-
 glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
 {
     // TODO(Aurore): max distance à déterminer
-    float maxDistance = m_radius.value / 2.f;
+    float maxDistance = m_radius / 2.f;
 
     // Count of boids to close from current boid
     size_t    count = 0;
@@ -87,16 +85,13 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
     {
         total /= count;
     }
-    // else
-    // {
-    //     total = glm::vec3(p6::rotated_by(p6::Angle(m_direction), glm::vec2(1., 0.)), 0.);
-    // }
+
     return total;
 }
 
 glm::vec3 Boid::alignment(const std::vector<Boid>& neighbors)
 {
-    float distanceOfVision = m_radius.value * 2.f;
+    float distanceOfVision = m_radius * 2.f;
 
     // Count of boids to close from current boid
     size_t    count = 0;
@@ -134,7 +129,7 @@ float Boid::distance(const Boid& anotherBoid) const
 
 glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
 {
-    float distanceAttraction = m_radius.value * 5.f;
+    float distanceAttraction = m_radius * 5.f;
 
     // Count of boids to close from current boid
     size_t count = 0;

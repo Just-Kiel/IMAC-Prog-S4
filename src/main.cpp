@@ -28,9 +28,9 @@ std::vector<Boid> createBoids(p6::Context& ctx)
     for (size_t i = 0; i < nbBoids; ++i)
     {
         allBoids.emplace_back(
-            glm::vec3(distribution(gen) * ctx.aspect_ratio(), distribution(gen), 0),
-            p6::Radius(0.1f),
-            static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen))
+            glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
+            0.1f,
+            boidModel
         );
     }
 
@@ -85,7 +85,11 @@ int main(int argc, char* argv[])
             {
                 while (nbBoids > allBoids.size())
                 {
-                    allBoids.emplace_back(glm::vec3(distribution(gen) * ctx.aspect_ratio(), distribution(gen), 0), p6::Radius(radius), static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen)));
+                    allBoids.emplace_back(
+                        glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
+                        radius,
+                        modelsLOD
+                    );
                 }
 
                 while (nbBoids < allBoids.size())
@@ -100,7 +104,11 @@ int main(int argc, char* argv[])
 
                 for (size_t i = 0; i < nbBoids; ++i)
                 {
-                    allBoids.emplace_back(glm::vec3(distribution(gen) * ctx.aspect_ratio(), distribution(gen), 0), p6::Radius(radius), static_cast<p6::Rotation>(2.0_radians * p6::PI * distribution(gen)));
+                    allBoids.emplace_back(
+                        glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
+                        radius,
+                        modelsLOD
+                    );
                 }
             }
         }
