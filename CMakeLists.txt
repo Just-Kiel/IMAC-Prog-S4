@@ -44,7 +44,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE doctest::doctest)
 FetchContent_Declare(
     p6
     GIT_REPOSITORY https://github.com/julesfouchy/p6
-    GIT_TAG b9e6366e1198abdd7bc835e6125f9ff5b89a75b8
+    GIT_TAG 8346d1e27567815bb9b231cf3ecbfaf1e3bd832a
 )
 FetchContent_MakeAvailable(p6)
 target_link_libraries(${PROJECT_NAME} PRIVATE p6::p6)
+
+# ---Set the output folder---
+set_target_properties(${PROJECT_NAME} PROPERTIES
+RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME})
+
+# ---Copy the assets and the shaders to the output folder (where the executable is created)---
+Cool__target_copy_folder(${PROJECT_NAME} assets)
+Cool__target_copy_folder(${PROJECT_NAME} shaders)
