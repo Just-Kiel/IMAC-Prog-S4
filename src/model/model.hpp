@@ -1,10 +1,21 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "LOD.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+#include "openGL/VAO.hpp"
+#include "openGL/VBO.hpp"
+#include "opengl/vbo.hpp"
 #include "p6/p6.h"
 
+// Struct for model params
+struct ModelParams {
+    glm::vec3 center;
+    float     scale;
+    glm::vec3 direction;
+    LOD       lod;
+};
 class Model {
 private:
     std::string            m_urlPath;
@@ -12,18 +23,23 @@ private:
     std::vector<glm::vec2> m_outUvs{};
     std::vector<glm::vec3> m_outNormals{};
 
-    GLuint m_vao;
-    GLuint m_vboPositions;
-    GLuint m_vboNormals;
-    GLuint m_vboTexCoords;
+    VAO m_vao;
+    VBO m_vboPositions;
+    VBO m_vboNormals;
+    VBO m_vboTexCoords;
 
 public:
     Model() = default;
     Model(std::string urlPath);
-    ~Model();
+
+    // move constructor
+    Model(Model&& other) noexcept;
+
+    // move assignment operator
+    Model& operator=(Model&& other) noexcept;
 
     void loadObj();
     void initModel();
 
-    void drawModel(const p6::Shader& shader, glm::mat4& ProjMatrix, glm::mat4& view, glm::vec3& center, p6::Radius& radius, glm::vec3& direction);
+    void drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params);
 };

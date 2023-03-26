@@ -7,20 +7,41 @@
 #include "glm/gtx/transform.hpp"
 #include "p6/p6.h"
 
+void computeDirectionVectors(glm::vec3& frontAxis, glm::vec3& leftAxis, glm::vec3& upAxis, const glm::vec3& direction)
+{
+    frontAxis = glm::normalize(direction);
+    leftAxis  = glm::normalize(glm::cross(frontAxis, glm::vec3(0, 1, 0)));
+    upAxis    = glm::normalize(glm::cross(leftAxis, frontAxis));
+}
+
 Model::Model(std::string urlPath)
     : m_urlPath(std::move(urlPath))
 {
-    glGenBuffers(1, &m_vboPositions);
-    glGenBuffers(1, &m_vboNormals);
-    glGenBuffers(1, &m_vboTexCoords);
 }
 
-Model::~Model()
+Model::Model(Model&& other) noexcept
+    : m_urlPath(std::move(other.m_urlPath))
+    , m_outVertices(std::move(other.m_outVertices))
+    , m_outUvs(std::move(other.m_outUvs))
+    , m_outNormals(std::move(other.m_outNormals))
+    , m_vao(std::move(other.m_vao))
+    , m_vboPositions(std::move(other.m_vboPositions))
+    , m_vboNormals(std::move(other.m_vboNormals))
+    , m_vboTexCoords(std::move(other.m_vboTexCoords))
 {
-    glDeleteBuffers(1, &m_vboPositions);
-    glDeleteBuffers(1, &m_vboNormals);
-    glDeleteBuffers(1, &m_vboTexCoords);
-    glDeleteVertexArrays(1, &m_vao);
+}
+
+Model& Model::operator=(Model&& other) noexcept
+{
+    m_urlPath      = std::move(other.m_urlPath);
+    m_outVertices  = std::move(other.m_outVertices);
+    m_outUvs       = std::move(other.m_outUvs);
+    m_outNormals   = std::move(other.m_outNormals);
+    m_vao          = std::move(other.m_vao);
+    m_vboPositions = std::move(other.m_vboPositions);
+    m_vboNormals   = std::move(other.m_vboNormals);
+    m_vboTexCoords = std::move(other.m_vboTexCoords);
+    return *this;
 }
 
 void Model::loadObj()
@@ -139,18 +160,17 @@ void Model::loadObj()
 
 void Model::initModel()
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboPositions);
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboPositions);
     glBufferData(GL_ARRAY_BUFFER, m_outVertices.size() * sizeof(glm::vec3), m_outVertices.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboNormals);
     glBufferData(GL_ARRAY_BUFFER, m_outNormals.size() * sizeof(glm::vec3), m_outNormals.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboTexCoords);
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboTexCoords);
     glBufferData(GL_ARRAY_BUFFER, m_outUvs.size() * sizeof(glm::vec2), m_outUvs.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
+    glBindVertexArray(*m_vao);
 
     const GLuint VERTEX_ATTR_POSITION   = 0;
     const GLuint VERTEX_ATTR_NORMAL     = 1;
@@ -160,33 +180,42 @@ void Model::initModel()
     glEnableVertexAttribArray(VERTEX_ATTR_TEX_COORDS);
 
     // Specification
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboPositions);
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboPositions);
     glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboNormals);
     glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboTexCoords);
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboTexCoords);
     glVertexAttribPointer(VERTEX_ATTR_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 
-void Model::drawModel(const p6::Shader& shader, glm::mat4& ProjMatrix, glm::mat4& view, glm::vec3& center, p6::Radius& radius, glm::vec3& direction)
+void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params)
 {
     glm::mat4 MVMatrix = view;
 
     // Translate the model to the position
-    MVMatrix = glm::translate(MVMatrix, center);
+    MVMatrix = glm::translate(MVMatrix, params.center);
 
     // Rotate the model to the correct direction
+    glm::vec3 frontAxis, leftAxis, upAxis;
 
-    //  BUG : The model is not rotated correctly
-    // TODO : Should do like freefly matrix
-    MVMatrix = MVMatrix * glm::lookAt({}, direction, glm::vec3(0, 1, 0));
+    computeDirectionVectors(frontAxis, leftAxis, upAxis, params.direction);
+
+    // construct matrix from axes
+    glm::mat4 rotationMatrix = glm::mat4(
+        glm::vec4(leftAxis, 0.0f),
+        glm::vec4(upAxis, 0.0f),
+        glm::vec4(frontAxis, 0.0f),
+        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)
+    );
+
+    MVMatrix = MVMatrix * rotationMatrix;
 
     // Scale the model to the correct radius
-    MVMatrix = glm::scale(MVMatrix, glm::vec3{radius.value});
+    MVMatrix = glm::scale(MVMatrix, glm::vec3{params.scale});
 
     glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
@@ -197,7 +226,7 @@ void Model::drawModel(const p6::Shader& shader, glm::mat4& ProjMatrix, glm::mat4
     shader.set("uMVMatrix", MVMatrix);
     shader.set("uNormalMatrix", NormalMatrix);
 
-    glBindVertexArray(m_vao);
+    glBindVertexArray(*m_vao);
     glDrawArrays(GL_TRIANGLES, 0, m_outVertices.size());
     glBindVertexArray(0);
 }
