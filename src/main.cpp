@@ -9,13 +9,15 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "imgui.h"
+#include "model/model.hpp"
+#include "model/modelsLOD.hpp"
 #include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-std::vector<Boid> createBoids(p6::Context& ctx)
+std::vector<Boid> createBoids(p6::Context& ctx, ModelsLOD& boidModel)
 {
     size_t nbBoids = 2;
 
@@ -61,11 +63,31 @@ int main(int argc, char* argv[])
     auto ctx = p6::Context{{.title = "Projecto con Olivia"}};
     ctx.maximize_window();
 
+    // Shaders initialization
+    const p6::Shader shader = p6::load_shader(
+        "shaders/3D.vs.glsl",
+        "shaders/normals.fs.glsl"
+    );
+
+    glEnable(GL_DEPTH_TEST);
+
+    // Models
+    Model boidModel("assets/models/cone.obj");
+    boidModel.loadObj();
+    boidModel.initModel();
+
+    Model test("assets/models/cone.obj");
+    test.loadObj();
+    test.initModel();
+
+    ModelsLOD modelsLOD({"assets/models/cone.obj", "assets/models/test.obj", "assets/models/untitled.obj"});
+    modelsLOD.initModels();
+
     // Camera
     FreeflyCamera camera;
 
     // Boids instance
-    std::vector<Boid>             allBoids = createBoids(ctx);
+    std::vector<Boid>             allBoids = createBoids(ctx, modelsLOD);
     std::chrono::duration<double> elapsed_update_seconds;
     std::chrono::duration<double> elapsed_draw_seconds;
 
@@ -189,6 +211,7 @@ int main(int argc, char* argv[])
     ctx.key_pressed = [&](p6::Key key) {
         std::cout << "Key pressed: " << key.logical << std::endl;
 
+        // TODO(Aurore): PHYSICAL KEY
         if (key.logical == "q")
         {
             camera.moveLeft(5.f);

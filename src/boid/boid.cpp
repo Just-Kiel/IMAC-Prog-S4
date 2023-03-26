@@ -1,9 +1,14 @@
 #include "boid.hpp"
+// #include <cstddef>
 #include <vector>
 #include "detections/detections.hpp"
+// #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtx/norm.hpp"
+#include "glm/gtx/rotate_vector.hpp"
+#include "model/model.hpp"
+#include "model/modelsLOD.hpp"
 
 // Boid::Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation)
 //     : centeredCoord(center), m_radius(radius), m_rotation(rotation), m_direction(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.){
@@ -15,8 +20,14 @@
 // {
 //     m_direction = glm::vec3(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.);
 // };
+
+Boid::Boid(glm::vec3 center, float radius, ModelsLOD& model)
+    : centeredCoord(center), m_radius(radius), m_model(model)
 {
-    m_direction = glm::vec3(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.);
+    // m_direction = glm::vec3(p6::rotated_by(rotation, glm::vec2(1., 0.)), 0.);
+
+    // make random glm vec 3 normalized
+    m_direction = glm::normalize(glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000));
 };
 
 void Boid::setForces(Forces forces)
@@ -24,13 +35,54 @@ void Boid::setForces(Forces forces)
     m_forces = forces;
 }
 
-void Boid::draw(p6::Context& ctx)
+void Boid::draw(p6::Context& ctx, const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
 {
-    ctx.equilateral_triangle(
-        p6::Center{centeredCoord},
-        m_radius,
-        p6::Angle(glm::vec2(m_direction))
+    // 2D drawing
+    // ctx.equilateral_triangle(
+    //     p6::Center{centeredCoord},
+    //     m_radius,
+    //     p6::Angle(glm::vec2(m_direction))
+    // );
+
+    // update LOD
+    updateLOD(view);
+
+    // 3D drawing
+    m_model.drawModel(
+        shader,
+        projection,
+        view,
+        ModelParams{
+            centeredCoord,
+            m_radius,
+            m_direction,
+            m_lod}
     );
+}
+
+void Boid::updateLOD(glm::mat4& view)
+{
+    // TODO(Aurore): update LOD
+
+    // extract position from glm mat4
+    glm::vec3 position = glm::vec3(view[3]);
+
+    // calculate distance between boid and camera
+    float distance = glm::distance2(centeredCoord, position);
+
+    // if distance is less than 1, set LOD to LOD_HIGH
+    if (distance < 5)
+    {
+        m_lod = LOD::LOD_HIGH;
+    }
+    else if (distance < 15)
+    {
+        m_lod = LOD::LOD_MEDIUM;
+    }
+    else
+    {
+        m_lod = LOD::LOD_LOW;
+    }
 }
 
 void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
@@ -47,7 +99,6 @@ void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
     // Limit the speed
     m_direction = glm::normalize(m_direction);
 
-    // glm::vec3 move = glm::vec3(p6::rotated_by(m_rotation, glm::vec2(1., 0.)), 0.);
     centeredCoord += m_direction * speed / 100.f;
 }
 

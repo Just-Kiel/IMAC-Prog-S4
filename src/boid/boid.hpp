@@ -1,9 +1,13 @@
 #pragma once
 #include <array>
+#include <optional>
 #include <vector>
+#include "LOD.hpp"
 #include "forces/forces.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+#include "model/model.hpp"
+#include "model/modelsLOD.hpp"
 #include "p6/p6.h"
 
 class Boid {
@@ -16,9 +20,14 @@ private:
 
     Forces m_forces{};
 
+    ModelsLOD& m_model;
+
+    LOD m_lod = LOD::LOD_LOW;
+
 public:
     // Boid();
     // Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
+    Boid(glm::vec3 center, float radius, ModelsLOD& model);
 
     ~Boid() = default;
 
@@ -26,7 +35,9 @@ public:
 
     void setForces(Forces forces);
 
-    void draw(p6::Context& ctx);
+    void draw(p6::Context& ctx, const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
+
+    void updateLOD(glm::mat4& view);
 
     void updateCenter(float speed, const std::vector<Boid>& neighbors);
 
