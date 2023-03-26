@@ -169,7 +169,7 @@ void Boid::avoidObstacles()
     // return other direction if there is something
 }
 
-void Boid::avoidWalls(p6::Context& ctx)
+void Boid::avoidWalls(const float& radius)
 {
     // Avoid going outside of window
     // Look forward head at a set distance
@@ -178,23 +178,28 @@ void Boid::avoidWalls(p6::Context& ctx)
     // Min - max x = -ctx.aspect_ratio()/+ctx.aspect_ratio()
     // Min - max y = -1/1
     glm::vec3 frontDetection = (glm::normalize(m_direction) / 2.f) + centeredCoord;
-    glm::vec3 rightDetection = (glm::normalize(glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 45_degrees, glm::vec2(1., 0.)), 0.))) + centeredCoord;
+
+    glm::vec3 rightDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {0, 1, 0})) / 2.f) + centeredCoord;
 
     // Y detection
-    avoidUpWall(*this, frontDetection, rightDetection);
-    avoidDownWall(*this, frontDetection, rightDetection);
+    avoidUpWall(*this, frontDetection, rightDetection, radius);
+    avoidDownWall(*this, frontDetection, rightDetection, radius);
 
     // X detection
-    avoidLeftWall(*this, frontDetection, rightDetection, ctx);
-    avoidRightWall(*this, frontDetection, rightDetection, ctx);
+    avoidLeftWall(*this, frontDetection, rightDetection, radius);
+    avoidRightWall(*this, frontDetection, rightDetection, radius);
+
+    // Z detection
+    avoidFrontWall(*this, frontDetection, rightDetection, radius);
+    avoidBackWall(*this, frontDetection, rightDetection, radius);
 }
 
 void Boid::rotateLeft()
 {
-    m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) - 15_degrees, glm::vec2(1., 0.)), 0.);
+    m_direction = glm::rotate(m_direction, glm::radians(-15.f), {0, 1, 0});
 }
 
 void Boid::rotateRight()
 {
-    m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 15_degrees, glm::vec2(1., 0.)), 0.);
+    m_direction = glm::vec3(glm::rotate(m_direction, glm::radians(15.f), {0, 1, 0}));
 }

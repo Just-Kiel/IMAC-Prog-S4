@@ -38,7 +38,7 @@ public:
 
     void avoidObstacles();
 
-    void avoidWalls(p6::Context& ctx);
+    void avoidWalls(const float& radius);
 
     void rotateLeft();
 

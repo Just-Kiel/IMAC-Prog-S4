@@ -54,6 +54,9 @@ int main(int argc, char* argv[])
     std::default_random_engine            gen;
     std::uniform_real_distribution<float> distribution(-1.0, 1.0);
 
+    // Cell info
+    float cellSize = 1.f;
+
     // Actual app
     auto ctx = p6::Context{{.title = "Projecto con Olivia"}};
     ctx.maximize_window();
@@ -130,6 +133,11 @@ int main(int argc, char* argv[])
             allObstacles.clear();
         }
         ImGui::End();
+
+        // Show another simple window, this time using an explicit Begin/End pair
+        ImGui::Begin("Cell zone");
+        ImGui::SliderFloat("Cell radius", &cellSize, 0.f, 25.f);
+        ImGui::End();
     };
 
     // Declare your infinite update loop.
@@ -145,7 +153,7 @@ int main(int argc, char* argv[])
         for (auto& boid : allBoids)
         {
             boid.updateCenter(speed, allBoids);
-            boid.avoidWalls(ctx);
+            boid.avoidWalls(cellSize);
             // boid.updateDir(speed, static_cast<p6::Angle>(0.05_radians * p6::PI * distribution(gen)));
         }
 
