@@ -1,10 +1,11 @@
-#include <vcruntime.h>
 #include <chrono>
 #include <cstdlib>
 #include <random>
 #include <vector>
 #include "boid/boid.hpp"
 #include "forces/forces.hpp"
+#include "freeflyCamera/freeflyCamera.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "imgui.h"
@@ -56,6 +57,9 @@ int main(int argc, char* argv[])
     // Actual app
     auto ctx = p6::Context{{.title = "Projecto con Olivia"}};
     ctx.maximize_window();
+
+    // Camera
+    FreeflyCamera camera;
 
     // Boids instance
     std::vector<Boid>             allBoids = createBoids(ctx);
@@ -122,7 +126,11 @@ int main(int argc, char* argv[])
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
-        ctx.background(p6::NamedColor::Blue);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shader.use();
+        glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        glm::mat4 ViewMatrix = camera.getViewMatrix();
+        // ctx.background(p6::NamedColor::Blue);
 
         auto start = std::chrono::system_clock::now();
 
@@ -138,7 +146,7 @@ int main(int argc, char* argv[])
         start = std::chrono::system_clock::now();
         for (auto& boid : allBoids)
         {
-            boid.draw(ctx);
+            boid.draw(ctx, shader, ProjMatrix, ViewMatrix);
         }
         elapsed_draw_seconds = std::chrono::system_clock::now() - start;
 
@@ -153,6 +161,33 @@ int main(int argc, char* argv[])
         {
             std::cout << "x = " << ctx.mouse()[0] << " y = " << ctx.mouse()[1] << std::endl;
             allObstacles.emplace_back(button.position.x, button.position.y, p6::Radius{0.03f});
+        }
+    };
+
+    // Camera controls
+    ctx.mouse_dragged = [&](p6::MouseDrag drag) {
+        camera.rotateLeft(drag.delta.x * 5.f);
+        camera.rotateUp(drag.delta.y * 5.f);
+    };
+
+    ctx.key_pressed = [&](p6::Key key) {
+        std::cout << "Key pressed: " << key.logical << std::endl;
+
+        if (key.logical == "q")
+        {
+            camera.moveLeft(5.f);
+        }
+        else if (key.logical == "d")
+        {
+            camera.moveLeft(-5.f);
+        }
+        else if (key.logical == "z")
+        {
+            camera.moveFront(1.f);
+        }
+        else if (key.logical == "s")
+        {
+            camera.moveFront(-1.f);
         }
     };
     // Should be done last. It starts the infinite loop.
