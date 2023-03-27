@@ -1,11 +1,10 @@
 #include "model/modelsLOD.hpp"
 
 ModelsLOD::ModelsLOD(std::vector<std::string> modelsPaths)
-    : m_models(modelsPaths.size())
 {
-    for (size_t i = 0; i < modelsPaths.size(); i++)
+    for (auto& modelsPath : modelsPaths)
     {
-        m_models[i] = Model(modelsPaths[i]);
+        m_models.emplace_back(modelsPath);
     }
 }
 

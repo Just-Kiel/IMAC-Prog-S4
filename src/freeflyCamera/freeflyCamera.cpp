@@ -49,3 +49,23 @@ glm::mat4 FreeflyCamera::getViewMatrix() const
 {
     return glm::lookAt(m_Position, m_Position + m_FrontVector, m_UpVector);
 }
+
+void cameraKeyControls(const p6::Key& key, FreeflyCamera& camera)
+{
+    if (key.physical == GLFW_KEY_A || key.physical == GLFW_KEY_LEFT)
+    {
+        camera.moveLeft(5.f);
+    }
+    else if (key.physical == GLFW_KEY_D || key.physical == GLFW_KEY_RIGHT)
+    {
+        camera.moveLeft(-5.f);
+    }
+    else if (key.physical == GLFW_KEY_W || key.physical == GLFW_KEY_UP)
+    {
+        camera.moveFront(1.f);
+    }
+    else if (key.physical == GLFW_KEY_S || key.physical == GLFW_KEY_DOWN)
+    {
+        camera.moveFront(-1.f);
+    }
+}

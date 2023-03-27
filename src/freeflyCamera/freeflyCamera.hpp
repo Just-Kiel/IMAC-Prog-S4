@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "p6/p6.h"
 
 class FreeflyCamera {
 private:
@@ -24,3 +25,5 @@ public:
 
     glm::mat4 getViewMatrix() const;
 };
+
+void cameraKeyControls(const p6::Key& key, FreeflyCamera& camera);

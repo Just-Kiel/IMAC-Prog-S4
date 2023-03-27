@@ -17,7 +17,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-std::vector<Boid> createBoids(p6::Context& ctx, ModelsLOD& boidModel)
+std::vector<Boid> createBoids(ModelsLOD& boidModel)
 {
     size_t nbBoids = 2;
 
@@ -70,24 +70,17 @@ int main(int argc, char* argv[])
     );
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
-    // Models
-    Model boidModel("assets/models/cone.obj");
-    boidModel.loadObj();
-    boidModel.initModel();
-
-    Model test("assets/models/cone.obj");
-    test.loadObj();
-    test.initModel();
-
-    ModelsLOD modelsLOD({"assets/models/cone.obj", "assets/models/test.obj", "assets/models/untitled.obj"});
+    // Models initialization
+    ModelsLOD modelsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
     modelsLOD.initModels();
 
     // Camera
     FreeflyCamera camera;
 
     // Boids instance
-    std::vector<Boid>             allBoids = createBoids(ctx, modelsLOD);
+    std::vector<Boid>             allBoids = createBoids(modelsLOD);
     std::chrono::duration<double> elapsed_update_seconds;
     std::chrono::duration<double> elapsed_draw_seconds;
 
@@ -168,7 +161,6 @@ int main(int argc, char* argv[])
         shader.use();
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 ViewMatrix = camera.getViewMatrix();
-        // ctx.background(p6::NamedColor::Blue);
 
         auto start = std::chrono::system_clock::now();
 
@@ -176,7 +168,6 @@ int main(int argc, char* argv[])
         {
             boid.updateCenter(speed, allBoids);
             boid.avoidWalls(cellSize);
-            // boid.updateDir(speed, static_cast<p6::Angle>(0.05_radians * p6::PI * distribution(gen)));
         }
 
         elapsed_update_seconds = std::chrono::system_clock::now() - start;
@@ -209,26 +200,9 @@ int main(int argc, char* argv[])
     };
 
     ctx.key_pressed = [&](p6::Key key) {
-        std::cout << "Key pressed: " << key.logical << std::endl;
-
-        // TODO(Aurore): PHYSICAL KEY
-        if (key.logical == "q")
-        {
-            camera.moveLeft(5.f);
-        }
-        else if (key.logical == "d")
-        {
-            camera.moveLeft(-5.f);
-        }
-        else if (key.logical == "z")
-        {
-            camera.moveFront(1.f);
-        }
-        else if (key.logical == "s")
-        {
-            camera.moveFront(-1.f);
-        }
+        cameraKeyControls(key, camera);
     };
+
     // Should be done last. It starts the infinite loop.
     ctx.start();
 }

@@ -6,7 +6,6 @@
 #include "glm/glm.hpp"
 #include "openGL/VAO.hpp"
 #include "openGL/VBO.hpp"
-#include "opengl/vbo.hpp"
 #include "p6/p6.h"
 
 // Struct for model params
@@ -31,12 +30,6 @@ private:
 public:
     Model() = default;
     Model(std::string urlPath);
-
-    // move constructor
-    Model(Model&& other) noexcept;
-
-    // move assignment operator
-    Model& operator=(Model&& other) noexcept;
 
     void loadObj();
     void initModel();

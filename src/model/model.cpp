@@ -19,31 +19,6 @@ Model::Model(std::string urlPath)
 {
 }
 
-Model::Model(Model&& other) noexcept
-    : m_urlPath(std::move(other.m_urlPath))
-    , m_outVertices(std::move(other.m_outVertices))
-    , m_outUvs(std::move(other.m_outUvs))
-    , m_outNormals(std::move(other.m_outNormals))
-    , m_vao(std::move(other.m_vao))
-    , m_vboPositions(std::move(other.m_vboPositions))
-    , m_vboNormals(std::move(other.m_vboNormals))
-    , m_vboTexCoords(std::move(other.m_vboTexCoords))
-{
-}
-
-Model& Model::operator=(Model&& other) noexcept
-{
-    m_urlPath      = std::move(other.m_urlPath);
-    m_outVertices  = std::move(other.m_outVertices);
-    m_outUvs       = std::move(other.m_outUvs);
-    m_outNormals   = std::move(other.m_outNormals);
-    m_vao          = std::move(other.m_vao);
-    m_vboPositions = std::move(other.m_vboPositions);
-    m_vboNormals   = std::move(other.m_vboNormals);
-    m_vboTexCoords = std::move(other.m_vboTexCoords);
-    return *this;
-}
-
 void Model::loadObj()
 {
     std::vector<unsigned int> vertexIndices;
