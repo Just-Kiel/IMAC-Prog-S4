@@ -8,6 +8,7 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+#include "glm/gtx/norm.hpp"
 #include "imgui.h"
 #include "model/model.hpp"
 #include "model/modelsLOD.hpp"
@@ -70,7 +71,7 @@ int main(int argc, char* argv[])
     );
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
 
     // Models initialization
     ModelsLOD modelsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
@@ -168,6 +169,7 @@ int main(int argc, char* argv[])
         {
             boid.updateCenter(speed, allBoids);
             boid.avoidWalls(cellSize);
+            boid.avoidObstacles(allObstacles);
         }
 
         elapsed_update_seconds = std::chrono::system_clock::now() - start;
@@ -184,12 +186,24 @@ int main(int argc, char* argv[])
             obstacle.draw(ctx);
         }
     };
-    // Mouse
+    // Obstacles controls
     ctx.mouse_pressed = [&](p6::MouseButton button) {
-        if (button.button == p6::Button::Left)
+        bool OnOtherObstacle = false;
+        if (button.button == p6::Button::Right)
         {
-            std::cout << "x = " << ctx.mouse()[0] << " y = " << ctx.mouse()[1] << std::endl;
-            allObstacles.emplace_back(button.position.x, button.position.y, p6::Radius{0.03f});
+            for (auto& obstacle : allObstacles)
+            {
+                float dist = glm::l2Norm(obstacle.getPosition(), glm::vec3(button.position.x, button.position.y, 0));
+                if (dist <= 2 * obstacle.getRadius().value)
+                {
+                    OnOtherObstacle = true;
+                }
+            }
+            if (!OnOtherObstacle)
+            {
+                allObstacles.emplace_back(button.position.x, button.position.y, p6::Radius{0.03f});
+            }
+            std::cout << OnOtherObstacle << std::endl;
         }
     };
 

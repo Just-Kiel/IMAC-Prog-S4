@@ -8,7 +8,9 @@
 #include "glm/glm.hpp"
 #include "model/model.hpp"
 #include "model/modelsLOD.hpp"
+#include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
+
 
 class Boid {
 private:
@@ -47,7 +49,7 @@ public:
 
     float distance(const Boid& anotherBoid) const;
 
-    void avoidObstacles();
+    void avoidObstacles(const std::vector<Obstacle>& allObstacles);
 
     void avoidWalls(const float& radius);
 

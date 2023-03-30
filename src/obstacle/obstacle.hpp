@@ -13,4 +13,8 @@ public:
     ~Obstacle() = default;
 
     void draw(p6::Context& ctx);
+
+    p6::Radius getRadius() const;
+
+    glm::vec3 getPosition() const;
 };

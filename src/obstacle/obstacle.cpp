@@ -11,9 +11,18 @@ Obstacle::Obstacle(float x, float y, p6::Radius radius)
 
 void Obstacle::draw(p6::Context& ctx)
 {
-    ctx.square(
+    ctx.circle(
         p6::Center{m_x, m_y},
-        m_radius,
-        p6::Rotation{0_turn}
+        m_radius
     );
+}
+
+p6::Radius Obstacle::getRadius() const
+{
+    return m_radius;
+}
+
+glm::vec3 Obstacle::getPosition() const
+{
+    return {m_x, m_y, 0};
 }
