@@ -224,9 +224,8 @@ void Boid::avoidObstacles(const std::vector<Obstacle>& allObs)
         glm::intersectLineSphere(centeredCoord, m_direction, obs.getPosition(), obs.getRadius(), obs.getPosition()-centeredCoord,glm::normalize(obs.getPosition()-centeredCoord));
         */
         float vecLengthCenters = glm::l2Norm(obs.getPosition(), centeredCoord);
-        if (vecLengthCenters < 10 * obs.getRadius().value)
+        if (vecLengthCenters < obs.getRadius().value)
         {
-            // rotateLeft();
             m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 25_degrees, glm::vec2(1., 0.)), 0.);
             std::cout << "roootate" << std::endl;
         }

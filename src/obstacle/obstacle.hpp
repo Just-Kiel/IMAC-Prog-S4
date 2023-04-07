@@ -1,18 +1,29 @@
 #pragma once
+#include "glm/fwd.hpp"
+#include "model/model.hpp"
+#include "model/modelsLOD.hpp"
 #include "p6/p6.h"
 
 class Obstacle {
 private:
-    float      m_x;
-    float      m_y;
-    p6::Radius m_radius;
+    glm::vec3 m_position;
+
+    glm::vec3 m_direction;
+
+    float m_radius;
+
+    ModelsLOD& m_model;
+
+    LOD m_lod = LOD::LOD_LOW;
 
 public:
-    Obstacle(float x, float y, p6::Radius radius);
+    Obstacle(glm::vec3 position, float radius, ModelsLOD& model);
 
     ~Obstacle() = default;
 
-    void draw(p6::Context& ctx);
+    void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
+
+    void updateLOD(glm::mat4& view);
 
     p6::Radius getRadius() const;
 

@@ -4,17 +4,55 @@
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtx/norm.hpp"
+#include "model/model.hpp"
+#include "model/modelsLOD.hpp"
 #include "obstacle/obstacle.hpp"
 
-Obstacle::Obstacle(float x, float y, p6::Radius radius)
-    : m_x(x), m_y(y), m_radius(radius){};
-
-void Obstacle::draw(p6::Context& ctx)
+Obstacle::Obstacle(glm::vec3 position, float radius, ModelsLOD& model)
+    : m_position(position), m_radius(radius), m_model(model)
 {
-    ctx.circle(
-        p6::Center{m_x, m_y},
-        m_radius
+    m_direction = glm::vec3(1, 0, 0);
+}
+
+void Obstacle::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
+{
+    updateLOD(view);
+
+    m_model.drawModel(
+        shader,
+        projection,
+        view,
+        ModelParams{
+            m_position,
+            m_radius,
+            m_direction,
+            m_lod}
     );
+}
+
+void Obstacle::updateLOD(glm::mat4& view)
+{
+    // TODO(Aurore): update LOD
+
+    // extract position from glm mat4
+    glm::vec3 position = glm::vec3(view[3]);
+
+    // calculate distance between boid and camera
+    float distance = glm::distance2(this->getPosition(), position);
+
+    // if distance is less than 1, set LOD to LOD_HIGH
+    if (distance < 5)
+    {
+        m_lod = LOD::LOD_HIGH;
+    }
+    else if (distance < 15)
+    {
+        m_lod = LOD::LOD_MEDIUM;
+    }
+    else
+    {
+        m_lod = LOD::LOD_LOW;
+    }
 }
 
 p6::Radius Obstacle::getRadius() const
@@ -24,5 +62,5 @@ p6::Radius Obstacle::getRadius() const
 
 glm::vec3 Obstacle::getPosition() const
 {
-    return {m_x, m_y, 0};
+    return m_position;
 }

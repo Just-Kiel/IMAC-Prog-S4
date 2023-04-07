@@ -71,11 +71,15 @@ int main(int argc, char* argv[])
     );
 
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     // Models initialization
     ModelsLOD modelsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
     modelsLOD.initModels();
+
+    // Models initialization
+    ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
+    modelObstacleLOD.initModels();
 
     // Camera
     FreeflyCamera camera;
@@ -183,7 +187,7 @@ int main(int argc, char* argv[])
 
         for (auto& obstacle : allObstacles)
         {
-            obstacle.draw(ctx);
+            obstacle.draw(shader, ProjMatrix, ViewMatrix);
         }
     };
     // Obstacles controls
@@ -193,7 +197,10 @@ int main(int argc, char* argv[])
         {
             for (auto& obstacle : allObstacles)
             {
-                float dist = glm::l2Norm(obstacle.getPosition(), glm::vec3(button.position.x, button.position.y, 0));
+                std::cout << "x = " << obstacle.getPosition()[0] << std::endl;
+                std::cout << "y = " << obstacle.getPosition()[1] << std::endl;
+                std::cout << "z = " << obstacle.getPosition()[2] << std::endl;
+                float dist = glm::distance(glm::vec2(obstacle.getPosition()[0], obstacle.getPosition()[1]), glm::vec2(button.position.x, button.position.y));
                 if (dist <= 2 * obstacle.getRadius().value)
                 {
                     OnOtherObstacle = true;
@@ -201,7 +208,8 @@ int main(int argc, char* argv[])
             }
             if (!OnOtherObstacle)
             {
-                allObstacles.emplace_back(button.position.x, button.position.y, p6::Radius{0.03f});
+                // TODO(Olivia) change in function cell size / view matrix
+                allObstacles.emplace_back(glm::vec3{-button.position.x, button.position.y, 0}, 0.1f, modelObstacleLOD);
             }
             std::cout << OnOtherObstacle << std::endl;
         }
