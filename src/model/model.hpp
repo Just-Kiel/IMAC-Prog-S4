@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "LOD.hpp"
+#include "LOD/LOD.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include "opengl/vao.hpp"

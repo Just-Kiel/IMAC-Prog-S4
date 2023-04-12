@@ -8,8 +8,8 @@
 #include "model/model.hpp"
 #include "model/modelsLOD.hpp"
 
-Boid::Boid(glm::vec3 center, float radius, ModelsLOD& model)
-    : m_centered_coord(center), m_radius(radius), m_model(model)
+Boid::Boid(glm::vec3 center, float radius)
+    : m_centered_coord(center), m_radius(radius)
 {
     // make random glm vec 3 normalized
     m_direction = glm::normalize(glm::vec3(p6::random::number(), p6::random::number(), p6::random::number()));
@@ -20,47 +20,30 @@ void Boid::setForces(Forces forces)
     m_forces = forces;
 }
 
-void Boid::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
+// void Boid::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
+// {
+//     // update LOD
+//     updateLOD(view);
+
+//     // 3D drawing
+//     m_model.drawModel(
+//         shader,
+//         projection,
+//         view,
+//         ModelParams{
+//             m_centered_coord,
+//             m_radius,
+//             m_direction,
+//             m_lod}
+//     );
+// }
+
+const ModelParams Boid::computeParams() const
 {
-    // update LOD
-    updateLOD(view);
-
-    // 3D drawing
-    m_model.drawModel(
-        shader,
-        projection,
-        view,
-        ModelParams{
-            m_centered_coord,
-            m_radius,
-            m_direction,
-            m_lod}
-    );
-}
-
-// TODO method computeParams
-
-void Boid::updateLOD(glm::mat4& view)
-{
-    // extract position from glm mat4
-    auto position = glm::vec3(view[3]);
-
-    // calculate distance between boid and camera
-    float distance = glm::distance2(m_centered_coord, position);
-
-    // if distance is less than 5, set LOD to LOD_HIGH
-    if (distance < 5)
-    {
-        m_lod = LOD::LOD_HIGH;
-    }
-    else if (distance < 15)
-    {
-        m_lod = LOD::LOD_MEDIUM;
-    }
-    else
-    {
-        m_lod = LOD::LOD_LOW;
-    }
+    return ModelParams{
+        m_centered_coord,
+        m_radius,
+        m_direction};
 }
 
 void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)

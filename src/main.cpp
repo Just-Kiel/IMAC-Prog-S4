@@ -18,7 +18,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-std::vector<Boid> createBoids(ModelsLOD& boidModel)
+std::vector<Boid> createBoids()
 {
     size_t nbBoids = 2;
 
@@ -29,8 +29,7 @@ std::vector<Boid> createBoids(ModelsLOD& boidModel)
     {
         allBoids.emplace_back(
             glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
-            0.01f,
-            boidModel
+            0.01f
         );
     }
 
@@ -69,8 +68,8 @@ int main(int argc, char* argv[])
     glEnable(GL_CULL_FACE);
 
     // Models initialization
-    ModelsLOD modelsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
-    modelsLOD.initModels();
+    ModelsLOD modelBoidsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
+    modelBoidsLOD.initModels();
 
     // Models initialization
     ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
     FreeflyCamera camera;
 
     // Boids instance
-    std::vector<Boid>             allBoids = createBoids(modelsLOD);
+    std::vector<Boid>             allBoids = createBoids();
     std::chrono::duration<double> elapsed_update_seconds{};
     std::chrono::duration<double> elapsed_draw_seconds{};
 
@@ -109,8 +108,7 @@ int main(int argc, char* argv[])
                 {
                     allBoids.emplace_back(
                         glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
-                        radius,
-                        modelsLOD
+                        radius
                     );
                 }
 
@@ -128,8 +126,7 @@ int main(int argc, char* argv[])
                 {
                     allBoids.emplace_back(
                         glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
-                        radius,
-                        modelsLOD
+                        radius
                     );
                 }
             }
@@ -161,6 +158,13 @@ int main(int argc, char* argv[])
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
+        // For both shadow mapping and rendering
+        std::vector<ModelParams> paramsAllBoids{allBoids.size()};
+        for (auto const& boid : allBoids)
+        {
+            paramsAllBoids.emplace_back(boid.computeParams());
+        }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
@@ -178,13 +182,9 @@ int main(int argc, char* argv[])
         elapsed_update_seconds = std::chrono::system_clock::now() - start;
 
         start = std::chrono::system_clock::now();
-        for (auto& boid : allBoids)
+        for (auto const& boid : paramsAllBoids)
         {
-            boid.draw(shader, ProjMatrix, ViewMatrix);
-
-            // TODO each compute
-
-            // TODO draw model
+            modelBoidsLOD.drawModel(shader, ProjMatrix, ViewMatrix, boid);
         }
         elapsed_draw_seconds = std::chrono::system_clock::now() - start;
 
