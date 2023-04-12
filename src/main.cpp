@@ -1,4 +1,3 @@
-#include <vcruntime.h>
 #include <chrono>
 #include <cstdlib>
 #include <random>
@@ -33,7 +32,7 @@ std::vector<Boid> createBoids(ModelsLOD& boidModel)
     {
         allBoids.emplace_back(
             glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
-            0.1f,
+            0.01f,
             boidModel
         );
     }
@@ -99,14 +98,17 @@ int main(int argc, char* argv[])
         ImGui::Begin("Boids parameters");
         ImGui::SliderFloat("Boids speed", &speed, 0.f, 2.f);
 
-        ImGui::LabelText("", "Elapsed update time: %fms", elapsed_update_seconds.count() * 1000.0);
-        ImGui::LabelText("", "Elapsed draw time: %fms", elapsed_draw_seconds.count() * 1000.0);
+        ImGui::Text("Elapsed update time: %fms", elapsed_update_seconds.count() * 1000.0);
+        ImGui::Text("Elapsed draw time: %fms", elapsed_draw_seconds.count() * 1000.0);
 
         {
-            glm::int32 nbBoids = allBoids.size();
-            float      radius  = nbBoids != 0 ? allBoids[0].radius() : 0.1f;
+            unsigned int nbBoids = allBoids.size();
+            float        radius  = nbBoids != 0 ? allBoids[0].radius() : 0.01f;
 
-            if (ImGui::SliderInt("Boids number", &nbBoids, 0, 5000))
+            unsigned int minNbBoids = 0;
+            unsigned int maxNbBoids = 500;
+
+            if (ImGui::SliderScalar("Boids number", ImGuiDataType_U32, &nbBoids, &minNbBoids, &maxNbBoids, "%u", ImGuiSliderFlags_AlwaysClamp))
             {
                 while (nbBoids > allBoids.size())
                 {
@@ -219,11 +221,11 @@ int main(int argc, char* argv[])
 
     // Camera controls
     ctx.mouse_dragged = [&](p6::MouseDrag drag) {
-        camera.rotateLeft(drag.delta.x * 5.f);
-        camera.rotateUp(drag.delta.y * 5.f);
+        camera.rotateLeft(drag.delta.x * 50.f);
+        camera.rotateUp(drag.delta.y * 50.f);
     };
 
-    ctx.key_pressed = [&](p6::Key key) {
+    ctx.key_pressed = [&](const p6::Key& key) {
         cameraKeyControls(key, camera);
     };
 
