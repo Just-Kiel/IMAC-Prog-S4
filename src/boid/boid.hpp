@@ -13,7 +13,7 @@
 
 class Boid {
 private:
-    glm::vec3 centeredCoord{};
+    glm::vec3 m_centered_coord{};
 
     float m_radius;
 
@@ -21,6 +21,7 @@ private:
 
     Forces m_forces{};
 
+    // TODO(Aurore): Instead draw with parameter and separate LOD from BOID
     ModelsLOD& m_model;
 
     LOD m_lod = LOD::LOD_LOW;
@@ -34,6 +35,7 @@ public:
 
     void setForces(Forces forces);
 
+    //  TODO rendering params and model
     void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
 
     void updateLOD(glm::mat4& view);

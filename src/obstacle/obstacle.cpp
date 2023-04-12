@@ -30,6 +30,7 @@ void Obstacle::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& 
     );
 }
 
+// TODO free function
 void Obstacle::updateLOD(glm::mat4& view)
 {
     // TODO(Aurore): update LOD

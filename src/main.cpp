@@ -22,16 +22,13 @@ std::vector<Boid> createBoids(ModelsLOD& boidModel)
 {
     size_t nbBoids = 2;
 
-    std::default_random_engine            gen;
-    std::uniform_real_distribution<float> distribution(-1.0, 1.0);
-
     // Boids init
     std::vector<Boid> allBoids;
 
     for (size_t i = 0; i < nbBoids; ++i)
     {
         allBoids.emplace_back(
-            glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
+            glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
             0.01f,
             boidModel
         );
@@ -52,10 +49,8 @@ int main(int argc, char* argv[])
     }
 
     // Speed info
-    float                                 speed = 0.001f;
-    Forces                                globalForces{1.f, 0.25f, 1.f};
-    std::default_random_engine            gen;
-    std::uniform_real_distribution<float> distribution(-1.0, 1.0);
+    float  speed = 0.001f;
+    Forces globalForces{1.f, 0.25f, 1.f};
 
     // Cell info
     float cellSize = 1.f;
@@ -113,7 +108,7 @@ int main(int argc, char* argv[])
                 while (nbBoids > allBoids.size())
                 {
                     allBoids.emplace_back(
-                        glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
+                        glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
                         radius,
                         modelsLOD
                     );
@@ -132,7 +127,7 @@ int main(int argc, char* argv[])
                 for (unsigned int i = 0; i < nbBoids; ++i)
                 {
                     allBoids.emplace_back(
-                        glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
+                        glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
                         radius,
                         modelsLOD
                     );
@@ -186,6 +181,10 @@ int main(int argc, char* argv[])
         for (auto& boid : allBoids)
         {
             boid.draw(shader, ProjMatrix, ViewMatrix);
+
+            // TODO each compute
+
+            // TODO draw model
         }
         elapsed_draw_seconds = std::chrono::system_clock::now() - start;
 
@@ -194,6 +193,7 @@ int main(int argc, char* argv[])
             obstacle.draw(shader, ProjMatrix, ViewMatrix);
         }
     };
+
     // Obstacles controls
     ctx.mouse_pressed = [&](p6::MouseButton button) {
         bool OnOtherObstacle = false;
@@ -201,8 +201,8 @@ int main(int argc, char* argv[])
         {
             for (auto& obstacle : allObstacles)
             {
-                float dist = glm::distance(glm::vec2(obstacle.getPosition()[0], obstacle.getPosition()[1]), glm::vec2(button.position.x, button.position.y));
-                if (dist <= 2 * obstacle.getRadius().value)
+                float dist = glm::distance(glm::vec2(obstacle.getPosition()), button.position);
+                if (dist <= 4 * obstacle.getRadius().value)
                 {
                     OnOtherObstacle = true;
                 }

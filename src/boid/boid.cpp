@@ -9,10 +9,10 @@
 #include "model/modelsLOD.hpp"
 
 Boid::Boid(glm::vec3 center, float radius, ModelsLOD& model)
-    : centeredCoord(center), m_radius(radius), m_model(model)
+    : m_centered_coord(center), m_radius(radius), m_model(model)
 {
     // make random glm vec 3 normalized
-    m_direction = glm::normalize(glm::vec3(rand() % 1000, rand() % 1000, rand() % 1000));
+    m_direction = glm::normalize(glm::vec3(p6::random::number(), p6::random::number(), p6::random::number()));
 };
 
 void Boid::setForces(Forces forces)
@@ -31,20 +31,22 @@ void Boid::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view
         projection,
         view,
         ModelParams{
-            centeredCoord,
+            m_centered_coord,
             m_radius,
             m_direction,
             m_lod}
     );
 }
 
+// TODO method computeParams
+
 void Boid::updateLOD(glm::mat4& view)
 {
     // extract position from glm mat4
-    glm::vec3 position = glm::vec3(view[3]);
+    auto position = glm::vec3(view[3]);
 
     // calculate distance between boid and camera
-    float distance = glm::distance2(centeredCoord, position);
+    float distance = glm::distance2(m_centered_coord, position);
 
     // if distance is less than 5, set LOD to LOD_HIGH
     if (distance < 5)
@@ -75,7 +77,7 @@ void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
     // Limit the speed
     m_direction = glm::normalize(m_direction);
 
-    centeredCoord += m_direction * speed / 100.f;
+    m_centered_coord += m_direction * speed / 100.f;
 }
 
 glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
@@ -97,7 +99,7 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
             if (distance < maxDistance)
             {
                 // Difference in term of position not length
-                glm::vec3 difference = this->centeredCoord - boid.centeredCoord;
+                glm::vec3 difference = this->m_centered_coord - boid.m_centered_coord;
 
                 glm::vec3 move = glm::normalize(difference) / static_cast<float>(difference.length());
 
@@ -150,7 +152,7 @@ glm::vec3 Boid::alignment(const std::vector<Boid>& neighbors)
 
 float Boid::distance(const Boid& anotherBoid) const
 {
-    return glm::distance2(this->centeredCoord, anotherBoid.centeredCoord);
+    return glm::distance2(this->m_centered_coord, anotherBoid.m_centered_coord);
 }
 
 glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
@@ -170,7 +172,7 @@ glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
 
             if (distance < distanceAttraction)
             {
-                averagePos += boid.centeredCoord;
+                averagePos += boid.m_centered_coord;
                 count++;
             }
         }
@@ -182,24 +184,25 @@ glm::vec3 Boid::cohesion(const std::vector<Boid>& neighbors)
         averagePos = glm::normalize(averagePos);
     }
 
-    glm::vec3 distancePos = averagePos - this->centeredCoord;
+    glm::vec3 distancePos = averagePos - this->m_centered_coord;
 
     return distancePos;
 }
 
 void Boid::avoidObstacles(const std::vector<Obstacle>& allObs)
 {
-    // Avoid going outside of window
+    // Avoid going in an obstacle
     // Look forward head at a set distance
     // return other direction if there is something
     for (auto const& obs : allObs)
     {
         /*
-        glm::intersectLineSphere(centeredCoord, m_direction, obs.getPosition(), obs.getRadius(), obs.getPosition()-centeredCoord,glm::normalize(obs.getPosition()-centeredCoord));
+        glm::intersectLineSphere(m_centered_coord, m_direction, obs.getPosition(), obs.getRadius(), obs.getPosition()-m_centered_coord,glm::normalize(obs.getPosition()-m_centered_coord));
         */
-        float vecLengthCenters = glm::l2Norm(obs.getPosition(), centeredCoord);
+        float vecLengthCenters = glm::l2Norm(obs.getPosition(), m_centered_coord);
         if (vecLengthCenters < obs.getRadius().value)
         {
+            // TODO(Aurore): Find a way to avoid the obstacle better because for the moment it's not working perfectly
             m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 25_degrees, glm::vec2(1., 0.)), 0.);
         }
     }
@@ -213,9 +216,9 @@ void Boid::avoidWalls(const float& radius)
 
     // Min - max x = -ctx.aspect_ratio()/+ctx.aspect_ratio()
     // Min - max y = -1/1
-    glm::vec3 frontDetection = (glm::normalize(m_direction) / 2.f) + centeredCoord;
+    glm::vec3 frontDetection = (glm::normalize(m_direction) / 2.f) + m_centered_coord;
 
-    glm::vec3 rightDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {0, 1, 0})) / 2.f) + centeredCoord;
+    glm::vec3 rightDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {0, 1, 0})) / 2.f) + m_centered_coord;
 
     // Y detection
     avoidUpWall(*this, frontDetection, rightDetection, radius);
