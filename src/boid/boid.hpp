@@ -2,7 +2,7 @@
 #include <array>
 #include <optional>
 #include <vector>
-#include "LOD.hpp"
+#include "LOD/LOD.hpp"
 #include "forces/forces.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
@@ -11,10 +11,9 @@
 #include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
 
-
 class Boid {
 private:
-    glm::vec3 centeredCoord{};
+    glm::vec3 m_centered_coord{};
 
     float m_radius;
 
@@ -22,14 +21,10 @@ private:
 
     Forces m_forces{};
 
-    ModelsLOD& m_model;
-
-    LOD m_lod = LOD::LOD_LOW;
+    // TODO(Aurore): Instead draw with parameter and separate LOD from BOID
 
 public:
-    // Boid();
-    // Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
-    Boid(glm::vec3 center, float radius, ModelsLOD& model);
+    Boid(glm::vec3 center, float radius);
 
     ~Boid() = default;
 
@@ -37,9 +32,10 @@ public:
 
     void setForces(Forces forces);
 
-    void draw(p6::Context& ctx, const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
+    //  TODO rendering params and model
+    // void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
 
-    void updateLOD(glm::mat4& view);
+    const ModelParams computeParams() const;
 
     void updateCenter(float speed, const std::vector<Boid>& neighbors);
 
