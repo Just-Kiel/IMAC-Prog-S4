@@ -11,7 +11,6 @@
 #include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
 
-
 class Boid {
 private:
     glm::vec3 centeredCoord{};
@@ -27,8 +26,6 @@ private:
     LOD m_lod = LOD::LOD_LOW;
 
 public:
-    // Boid();
-    // Boid(glm::vec3 center, p6::Radius radius, p6::Rotation rotation);
     Boid(glm::vec3 center, float radius, ModelsLOD& model);
 
     ~Boid() = default;
