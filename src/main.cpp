@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
 
     // Boids instance
     std::vector<Boid>             allBoids = createBoids(modelsLOD);
-    std::chrono::duration<double> elapsed_update_seconds;
-    std::chrono::duration<double> elapsed_draw_seconds;
+    std::chrono::duration<double> elapsed_update_seconds{};
+    std::chrono::duration<double> elapsed_draw_seconds{};
 
     // Obstacles
     std::vector<Obstacle> allObstacles;
@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
             {
                 allBoids.clear();
 
-                for (size_t i = 0; i < nbBoids; ++i)
+                for (unsigned int i = 0; i < nbBoids; ++i)
                 {
                     allBoids.emplace_back(
                         glm::vec3(distribution(gen), distribution(gen), distribution(gen)),
@@ -201,9 +201,6 @@ int main(int argc, char* argv[])
         {
             for (auto& obstacle : allObstacles)
             {
-                std::cout << "x = " << obstacle.getPosition()[0] << std::endl;
-                std::cout << "y = " << obstacle.getPosition()[1] << std::endl;
-                std::cout << "z = " << obstacle.getPosition()[2] << std::endl;
                 float dist = glm::distance(glm::vec2(obstacle.getPosition()[0], obstacle.getPosition()[1]), glm::vec2(button.position.x, button.position.y));
                 if (dist <= 2 * obstacle.getRadius().value)
                 {
@@ -215,7 +212,6 @@ int main(int argc, char* argv[])
                 // TODO(Olivia) change in function cell size / view matrix
                 allObstacles.emplace_back(glm::vec3{-button.position.x, button.position.y, 0}, 0.1f, modelObstacleLOD);
             }
-            std::cout << OnOtherObstacle << std::endl;
         }
     };
 
