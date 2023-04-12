@@ -67,8 +67,15 @@ int main(int argc, char* argv[])
     // Shaders initialization
     const p6::Shader shader = p6::load_shader(
         "shaders/3D.vs.glsl",
-        "shaders/normals.fs.glsl"
+        //"shaders/normals.fs.glsl"
+        "shaders/pointLight.fs.glsl"
     );
+
+    GLint uKdID             = glGetUniformLocation(shader.id(), "uKd");
+    GLint uKsID             = glGetUniformLocation(shader.id(), "uKs");
+    GLint uShininessID      = glGetUniformLocation(shader.id(), "uShininess");
+    GLint uLightPos_vsID    = glGetUniformLocation(shader.id(), "uLightPos_vs");
+    GLint uLightIntensityID = glGetUniformLocation(shader.id(), "uLightIntensity");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -166,6 +173,19 @@ int main(int argc, char* argv[])
         shader.use();
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 ViewMatrix = camera.getViewMatrix();
+
+        // lighting
+        glUniform3f(uKdID, 0.9f, 0.8f, 0.9f);
+        glUniform3f(uKsID, 0.2f, 0.3f, 0.2f);
+        glUniform1f(uShininessID, 100.f);
+
+        glm::vec3 lightDir = glm::vec3(1.f, 1.f, 1.f);
+
+        lightDir = ViewMatrix * glm::vec4(lightDir, 0.f);
+
+        glUniform3f(uLightPos_vsID, lightDir.x, lightDir.y, lightDir.z);
+
+        glUniform3f(uLightIntensityID, 2.f, 2.f, 2.f);
 
         auto start = std::chrono::system_clock::now();
 
