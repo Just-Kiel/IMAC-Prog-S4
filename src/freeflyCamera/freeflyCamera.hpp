@@ -9,9 +9,9 @@ private:
     float     m_Phi;
     float     m_Theta;
 
-    glm::vec3 m_FrontVector;
-    glm::vec3 m_LeftVector;
-    glm::vec3 m_UpVector;
+    glm::vec3 m_FrontVector{};
+    glm::vec3 m_LeftVector{};
+    glm::vec3 m_UpVector{};
 
 public:
     FreeflyCamera();

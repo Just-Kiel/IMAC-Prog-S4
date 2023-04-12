@@ -202,6 +202,6 @@ void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, con
     shader.set("uNormalMatrix", NormalMatrix);
 
     glBindVertexArray(*m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, m_outVertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_outVertices.size()));
     glBindVertexArray(0);
 }

@@ -1,3 +1,4 @@
+#include <vcruntime.h>
 #include <chrono>
 #include <cstdlib>
 #include <random>
@@ -100,9 +101,10 @@ int main(int argc, char* argv[])
 
         ImGui::LabelText("", "Elapsed update time: %fms", elapsed_update_seconds.count() * 1000.0);
         ImGui::LabelText("", "Elapsed draw time: %fms", elapsed_draw_seconds.count() * 1000.0);
+
         {
-            int   nbBoids = allBoids.size();
-            float radius  = nbBoids != 0 ? allBoids[0].radius() : 0.1f;
+            glm::int32 nbBoids = allBoids.size();
+            float      radius  = nbBoids != 0 ? allBoids[0].radius() : 0.1f;
 
             if (ImGui::SliderInt("Boids number", &nbBoids, 0, 5000))
             {
@@ -181,7 +183,7 @@ int main(int argc, char* argv[])
         start = std::chrono::system_clock::now();
         for (auto& boid : allBoids)
         {
-            boid.draw(ctx, shader, ProjMatrix, ViewMatrix);
+            boid.draw(shader, ProjMatrix, ViewMatrix);
         }
         elapsed_draw_seconds = std::chrono::system_clock::now() - start;
 

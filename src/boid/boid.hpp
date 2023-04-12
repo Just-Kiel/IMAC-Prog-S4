@@ -37,7 +37,7 @@ public:
 
     void setForces(Forces forces);
 
-    void draw(p6::Context& ctx, const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
+    void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
 
     void updateLOD(glm::mat4& view);
 

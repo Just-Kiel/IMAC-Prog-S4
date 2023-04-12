@@ -35,15 +35,8 @@ void Boid::setForces(Forces forces)
     m_forces = forces;
 }
 
-void Boid::draw(p6::Context& ctx, const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
+void Boid::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
 {
-    // 2D drawing
-    // ctx.equilateral_triangle(
-    //     p6::Center{centeredCoord},
-    //     m_radius,
-    //     p6::Angle(glm::vec2(m_direction))
-    // );
-
     // update LOD
     updateLOD(view);
 

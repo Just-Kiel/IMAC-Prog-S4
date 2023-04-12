@@ -4,8 +4,8 @@
 #include "LOD.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
-#include "openGL/VAO.hpp"
-#include "openGL/VBO.hpp"
+#include "opengl/vao.hpp"
+#include "opengl/vbo.hpp"
 #include "p6/p6.h"
 
 // Struct for model params
