@@ -175,12 +175,17 @@ int main(int argc, char* argv[])
         shader.set("uKd", glm::vec3{0.9f, 0.8f, 0.9f});
         shader.set("uKs", glm::vec3{0.2f, 0.3f, 0.2f});
         shader.set("uShininess", 100.f);
-
-        glm::vec3 lightDir = glm::vec3(1.f, 1.f, 1.f);
-        lightDir           = ViewMatrix * glm::vec4(lightDir, 0.f);
-
-        shader.set("uLightPos_vs", lightDir);
         shader.set("uLightIntensity", glm::vec3{2.f, 2.f, 2.f});
+
+        // Positions Lights
+        glm::vec3 pointLightPositions[] = {
+            glm::vec3(2.3f, -3.3f, -4.0f),
+            glm::vec3(-0.7f, -0.2f, -2.0f)};
+
+        // point light 1
+        shader.set("u_lightsPos[0]", pointLightPositions[0]);
+        // point light 2
+        shader.set("u_lightsPos[1]", pointLightPositions[1]);
 
         auto start = std::chrono::system_clock::now();
 
