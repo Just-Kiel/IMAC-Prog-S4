@@ -13,7 +13,7 @@ Boid::Boid(glm::vec3 center, float radius)
     : m_centered_coord(center), m_radius(radius)
 {
     // make random glm vec 3 normalized
-    m_direction = glm::normalize(glm::vec3(p6::random::number(), p6::random::number(), p6::random::number()));
+    m_direction = glm::normalize(glm::vec3(p6::random::number(), p6::random::number(), p6::random::number())); // We know it not perfect but its ok :)
 };
 
 void Boid::setForces(Forces forces)
@@ -39,7 +39,7 @@ void Boid::setForces(Forces forces)
 //     );
 // }
 
-const ModelParams Boid::computeParams() const
+ModelParams Boid::computeParams() const
 {
     return ModelParams{
         m_centered_coord,
@@ -75,21 +75,21 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
     // Check for every boids if its to close
     for (auto const& boid : neighbors)
     {
-        if (&boid != this)
+        if (&boid == this)
+            continue;
+
+        // Calculate distance
+        float distance = this->distance(boid);
+
+        if (distance < maxDistance) // TODO continue
         {
-            // Calculate distance
-            float distance = this->distance(boid);
+            // Difference in term of position not length
+            glm::vec3 difference = this->m_centered_coord - boid.m_centered_coord;
 
-            if (distance < maxDistance)
-            {
-                // Difference in term of position not length
-                glm::vec3 difference = this->m_centered_coord - boid.m_centered_coord;
+            glm::vec3 move = glm::normalize(difference) / static_cast<float>(difference.length());
 
-                glm::vec3 move = glm::normalize(difference) / static_cast<float>(difference.length());
-
-                total += move;
-                count++;
-            }
+            total += move;
+            count++;
         }
     }
 

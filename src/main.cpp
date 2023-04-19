@@ -50,7 +50,11 @@ int main(int argc, char* argv[])
 
     // Speed info
     float  speed = 0.001f;
-    Forces globalForces{1.f, 0.25f, 1.f};
+    Forces globalForces{
+        .m_separationForce = 1.f,
+        .m_cohesionForce   = 0.25f,
+        .m_alignmentForce  = 1.f,
+    };
 
     // Cell info
     float cellSize = 1.f;
@@ -71,19 +75,19 @@ int main(int argc, char* argv[])
 
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
-    modelBoidsLOD.initModels();
+    modelBoidsLOD.initModels(); // TODO do this in ModelsLOD constructor
 
     // Models initialization
     ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
-    modelObstacleLOD.initModels();
+    modelObstacleLOD.initModels(); // TODO do this in ModelsLOD constructor
 
     // Model initialization
     Model cellGlobal("assets/models/cell.obj");
-    cellGlobal.loadObj();
-    cellGlobal.initModel();
+    cellGlobal.loadObj();   // Do this in Model constructor
+    cellGlobal.initModel(); // Do this in Model constructor
 
     ModelParams cellParams{
-        glm::vec3(0, -1, 0),
+        glm::vec3(0, -1, 0), // TODO use designated initializers
         1.f,
         glm::vec3(-1, 0, 0)};
 
@@ -92,8 +96,8 @@ int main(int argc, char* argv[])
 
     // Boids instance
     std::vector<Boid>             allBoids = createBoids();
-    std::chrono::duration<double> elapsed_update_seconds{};
-    std::chrono::duration<double> elapsed_draw_seconds{};
+    std::chrono::duration<double> elapsed_update_seconds{}; // TODO move into a Perfs class
+    std::chrono::duration<double> elapsed_draw_seconds{};   // TODO move into a Perfs class
 
     // Obstacles
     std::vector<Obstacle> allObstacles;
@@ -137,9 +141,10 @@ int main(int argc, char* argv[])
     // Declare your infinite update loop
     ctx.update = [&]() {
         // For both shadow mapping and rendering
-        glm::mat4 ViewMatrix = camera.getViewMatrix();
-        auto      cameraPos  = glm::vec3(ViewMatrix[3]);
+        const glm::mat4 ViewMatrix = camera.getViewMatrix();
+        const auto      cameraPos  = glm::vec3(ViewMatrix[3]);
 
+        // TODO move to a function
         std::vector<ModelParams> paramsAllBoids{allBoids.size()};
         for (auto const& boid : allBoids)
         {
@@ -147,15 +152,18 @@ int main(int argc, char* argv[])
             params.lod         = updateLOD(cameraPos, params.center);
             paramsAllBoids.emplace_back(params);
         }
+        ////////
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
-        glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        const glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
 
-        // lighting
+        // lighting (material)
         shader.set("uKd", glm::vec3{0.9f, 0.8f, 0.9f});
         shader.set("uKs", glm::vec3{0.2f, 0.3f, 0.2f});
         shader.set("uShininess", 100.f);
+
+        // lighting (light)
         shader.set("uLightIntensity", glm::vec3{2.f, 2.f, 2.f});
 
         // Positions Lights
@@ -168,10 +176,12 @@ int main(int argc, char* argv[])
         // point light 2
         shader.set("u_lightsPos[1]", pointLightPositions[1]);
 
-        float tempCellSize = cellParams.scale;
-        cellParams.scale *= 1.5f;
-        cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
-        cellParams.scale = tempCellSize;
+        {
+            const float backupCellSize = cellParams.scale;
+            cellParams.scale *= 1.5f; // TODO expliquer :  on a besoin d'avoir nos boids qui resten /....
+            cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
+            cellParams.scale = backupCellSize;
+        }
 
         auto start = std::chrono::system_clock::now();
 
@@ -191,9 +201,10 @@ int main(int argc, char* argv[])
         }
         elapsed_draw_seconds = std::chrono::system_clock::now() - start;
 
-        for (auto& obstacle : allObstacles)
+        for (auto& obstacle : allObstacles) // TODO should be const
         {
-            obstacle.draw(shader, ProjMatrix, ViewMatrix);
+            // TODO fix it in another draw way
+            // obstacle.draw(shader, ProjMatrix, ViewMatrix);
         }
     };
 

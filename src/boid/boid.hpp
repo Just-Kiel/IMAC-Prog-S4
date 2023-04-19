@@ -15,9 +15,9 @@ class Boid {
 private:
     glm::vec3 m_centered_coord{};
 
-    float m_radius;
+    float m_radius{1.f};
 
-    glm::vec3 m_direction;
+    glm::vec3 m_direction{1.f, 0.f, 0.f};
 
     Forces m_forces{};
 
@@ -26,16 +26,14 @@ private:
 public:
     Boid(glm::vec3 center, float radius);
 
-    ~Boid() = default;
-
     inline float radius() const { return m_radius; }
 
-    void setForces(Forces forces);
+    void setForces(Forces forces); // TODO don't store forces in boid, just pass it to updateCenter
 
     //  TODO rendering params and model
     // void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
 
-    const ModelParams computeParams() const;
+    ModelParams computeParams() const;
 
     void updateCenter(float speed, const std::vector<Boid>& neighbors);
 

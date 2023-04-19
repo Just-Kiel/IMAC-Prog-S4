@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "LOD/LOD.hpp"
 #include "model/model.hpp"
 
 class ModelsLOD {
@@ -8,8 +9,7 @@ private:
 
 public:
     ModelsLOD() = default;
-    ModelsLOD(std::vector<std::string> modelsPaths);
-    ~ModelsLOD() = default;
+    ModelsLOD(std::array<std::string, LOD_COUNT> modelsPaths);
 
     void initModels();
 
