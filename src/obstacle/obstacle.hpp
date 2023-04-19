@@ -29,3 +29,5 @@ public:
 
     glm::vec3 getPosition() const;
 };
+
+void addObstacle(p6::MouseButton& button, std::vector<Obstacle>& allObstacles, ModelsLOD& modelObstacleLOD);

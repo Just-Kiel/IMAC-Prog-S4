@@ -15,7 +15,7 @@
 - [ ] Gérer de meilleure façon les neighbors de boids (facultatif selon Jules)
 
 
-- [ ] Penser à passer de la 2D à la 3D
+- [x] Penser à passer de la 2D à la 3D
 
 - [x] Handle correct rotation of boids
 - [x] detections en Z
@@ -37,3 +37,23 @@
 - [ ] Clic maintenu de la souris devient obstacle pour les boids
 - [ ] Do instancing for the boids
 - [ ] Put an HDRI in the scene (oli)
+
+
+
+# TO DO (19/04):
+- [ ] Rapport
+- [ ] Arpenteur
+  - [ ] Contraindre les mouvements
+- [ ] Modélisation
+  - [ ] Boids (Paperplane)
+  - [ ] Arpenteur
+  - [ ] Obstacles
+- [ ] Cube global environnement
+  - [ ] Cube Map ????
+- [ ] Obstacles par défaut
+- [ ] Shadow Mapping
+- [ ] Handle Material or texture
+- [ ] Instancing of draw calls
+- [ ] Obstacles :
+    - [ ] Handle collisions
+    - [ ] Handle creation (click)

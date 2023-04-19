@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <random>
 #include <vector>
+#include "LOD/LOD.hpp"
 #include "boid/boid.hpp"
 #include "forces/forces.hpp"
 #include "freeflyCamera/freeflyCamera.hpp"
@@ -20,7 +21,7 @@
 
 std::vector<Boid> createBoids()
 {
-    size_t nbBoids = 2;
+    size_t nbBoids = 1;
 
     // Boids init
     std::vector<Boid> allBoids;
@@ -66,7 +67,7 @@ int main(int argc, char* argv[])
     );
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
 
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
@@ -75,6 +76,16 @@ int main(int argc, char* argv[])
     // Models initialization
     ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
     modelObstacleLOD.initModels();
+
+    // Model initialization
+    Model cellGlobal("assets/models/cell.obj");
+    cellGlobal.loadObj();
+    cellGlobal.initModel();
+
+    ModelParams cellParams{
+        glm::vec3(0, -1, 0),
+        1.f,
+        glm::vec3(-1, 0, 0)};
 
     // Camera
     FreeflyCamera camera;
@@ -96,42 +107,8 @@ int main(int argc, char* argv[])
         ImGui::Text("Elapsed update time: %fms", elapsed_update_seconds.count() * 1000.0);
         ImGui::Text("Elapsed draw time: %fms", elapsed_draw_seconds.count() * 1000.0);
 
-        {
-            unsigned int nbBoids = allBoids.size();
-            float        radius  = nbBoids != 0 ? allBoids[0].radius() : 0.01f;
-
-            unsigned int minNbBoids = 0;
-            unsigned int maxNbBoids = 500;
-
-            if (ImGui::SliderScalar("Boids number", ImGuiDataType_U32, &nbBoids, &minNbBoids, &maxNbBoids, "%u", ImGuiSliderFlags_AlwaysClamp))
-            {
-                while (nbBoids > allBoids.size())
-                {
-                    allBoids.emplace_back(
-                        glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
-                        radius
-                    );
-                }
-
-                while (nbBoids < allBoids.size())
-                {
-                    allBoids.pop_back();
-                }
-            }
-
-            if (ImGui::SliderFloat("Boids radius", &radius, 0.f, 1.f))
-            {
-                allBoids.clear();
-
-                for (unsigned int i = 0; i < nbBoids; ++i)
-                {
-                    allBoids.emplace_back(
-                        glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
-                        radius
-                    );
-                }
-            }
-        }
+        // Boids
+        ImguiBoids(allBoids);
 
         // Forces
         {
@@ -153,23 +130,27 @@ int main(int argc, char* argv[])
 
         // Show another simple window, this time using an explicit Begin/End pair
         ImGui::Begin("Cell zone");
-        ImGui::SliderFloat("Cell radius", &cellSize, 0.f, 25.f);
+        ImGui::SliderFloat("Cell radius", &cellParams.scale, 1.f, 5.f);
         ImGui::End();
     };
 
-    // Declare your infinite update loop.
+    // Declare your infinite update loop
     ctx.update = [&]() {
         // For both shadow mapping and rendering
+        glm::mat4 ViewMatrix = camera.getViewMatrix();
+        auto      cameraPos  = glm::vec3(ViewMatrix[3]);
+
         std::vector<ModelParams> paramsAllBoids{allBoids.size()};
         for (auto const& boid : allBoids)
         {
-            paramsAllBoids.emplace_back(boid.computeParams());
+            ModelParams params = boid.computeParams();
+            params.lod         = updateLOD(cameraPos, params.center);
+            paramsAllBoids.emplace_back(params);
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
-        glm::mat4 ViewMatrix = camera.getViewMatrix();
 
         // lighting
         shader.set("uKd", glm::vec3{0.9f, 0.8f, 0.9f});
@@ -178,7 +159,7 @@ int main(int argc, char* argv[])
         shader.set("uLightIntensity", glm::vec3{2.f, 2.f, 2.f});
 
         // Positions Lights
-        glm::vec3 pointLightPositions[] = {
+        std::array pointLightPositions = {
             glm::vec3(2.3f, -3.3f, -4.0f),
             glm::vec3(-0.7f, -0.2f, -2.0f)};
 
@@ -187,13 +168,18 @@ int main(int argc, char* argv[])
         // point light 2
         shader.set("u_lightsPos[1]", pointLightPositions[1]);
 
+        float tempCellSize = cellParams.scale;
+        cellParams.scale *= 1.5f;
+        cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
+        cellParams.scale = tempCellSize;
+
         auto start = std::chrono::system_clock::now();
 
         for (auto& boid : allBoids)
         {
-            boid.updateCenter(speed, allBoids);
-            boid.avoidWalls(cellSize);
+            boid.avoidWalls(cellParams.scale);
             boid.avoidObstacles(allObstacles);
+            boid.updateCenter(speed, allBoids);
         }
 
         elapsed_update_seconds = std::chrono::system_clock::now() - start;
@@ -213,23 +199,7 @@ int main(int argc, char* argv[])
 
     // Obstacles controls
     ctx.mouse_pressed = [&](p6::MouseButton button) {
-        bool OnOtherObstacle = false;
-        if (button.button == p6::Button::Right)
-        {
-            for (auto& obstacle : allObstacles)
-            {
-                float dist = glm::distance(glm::vec2(obstacle.getPosition()), button.position);
-                if (dist <= 4 * obstacle.getRadius().value)
-                {
-                    OnOtherObstacle = true;
-                }
-            }
-            if (!OnOtherObstacle)
-            {
-                // TODO(Olivia) change in function cell size / view matrix
-                allObstacles.emplace_back(glm::vec3{-button.position.x, button.position.y, 0}, 0.1f, modelObstacleLOD);
-            }
-        }
+        addObstacle(button, allObstacles, modelObstacleLOD);
     };
 
     // Camera controls

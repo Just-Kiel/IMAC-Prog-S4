@@ -1,5 +1,6 @@
 #include "boid.hpp"
 #include <vector>
+#include "boid/boid.hpp"
 #include "detections/detections.hpp"
 #include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
@@ -199,9 +200,9 @@ void Boid::avoidWalls(const float& radius)
 
     // Min - max x = -ctx.aspect_ratio()/+ctx.aspect_ratio()
     // Min - max y = -1/1
-    glm::vec3 frontDetection = (glm::normalize(m_direction) / 2.f) + m_centered_coord;
+    glm::vec3 frontDetection = (glm::normalize(m_direction) * m_radius) + m_centered_coord;
 
-    glm::vec3 rightDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {0, 1, 0})) / 2.f) + m_centered_coord;
+    glm::vec3 rightDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {0, 1, 0})) * m_radius) + m_centered_coord;
 
     // Y detection
     avoidUpWall(*this, frontDetection, rightDetection, radius);
@@ -224,4 +225,42 @@ void Boid::rotateLeft()
 void Boid::rotateRight()
 {
     m_direction = glm::rotate(m_direction, glm::radians(15.f), {0, 1, 0});
+}
+
+void ImguiBoids(std::vector<Boid>& boids)
+{
+    unsigned int nbBoids = boids.size();
+    float        radius  = nbBoids != 0 ? boids[0].radius() : 0.01f;
+
+    unsigned int minNbBoids = 0;
+    unsigned int maxNbBoids = 500;
+
+    if (ImGui::SliderScalar("Boids number", ImGuiDataType_U32, &nbBoids, &minNbBoids, &maxNbBoids, "%u", ImGuiSliderFlags_AlwaysClamp))
+    {
+        while (nbBoids > boids.size())
+        {
+            boids.emplace_back(
+                glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
+                radius
+            );
+        }
+
+        while (nbBoids < boids.size())
+        {
+            boids.pop_back();
+        }
+    }
+
+    if (ImGui::SliderFloat("Boids radius", &radius, 0.f, 1.f))
+    {
+        boids.clear();
+
+        for (unsigned int i = 0; i < nbBoids; ++i)
+        {
+            boids.emplace_back(
+                glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
+                radius
+            );
+        }
+    }
 }

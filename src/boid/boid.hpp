@@ -53,3 +53,5 @@ public:
 
     void rotateRight();
 };
+
+void ImguiBoids(std::vector<Boid>& boids);

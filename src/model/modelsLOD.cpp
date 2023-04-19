@@ -20,13 +20,7 @@ void ModelsLOD::initModels()
 
 void ModelsLOD::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params)
 {
-    // extract position of camera from glm mat4
-    auto position = glm::vec3(view[3]);
-
-    // update LOD corresponding to the distance between the camera and the model
-    LOD lod = updateLOD(position, params.center);
-
     // draw model corresponding to the LOD
-    m_models[lod]
+    m_models[params.lod]
         .drawModel(shader, ProjMatrix, view, params);
 }
