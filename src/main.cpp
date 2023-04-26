@@ -15,6 +15,7 @@
 #include "model/modelsLOD.hpp"
 #include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
+#include "perfs/perfs.hpp"
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
@@ -56,7 +57,7 @@ int main(int argc, char* argv[])
         .m_alignmentForce  = 1.f,
     };
 
-    // Cell info
+    // TODO fix Cell info
     float cellSize = 1.f;
 
     // Actual app
@@ -75,29 +76,25 @@ int main(int argc, char* argv[])
 
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
-    modelBoidsLOD.initModels(); // TODO do this in ModelsLOD constructor
 
     // Models initialization
     ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
-    modelObstacleLOD.initModels(); // TODO do this in ModelsLOD constructor
 
     // Model initialization
     Model cellGlobal("assets/models/cell.obj");
-    cellGlobal.loadObj();   // Do this in Model constructor
-    cellGlobal.initModel(); // Do this in Model constructor
 
     ModelParams cellParams{
-        glm::vec3(0, -1, 0), // TODO use designated initializers
-        1.f,
-        glm::vec3(-1, 0, 0)};
+        .center    = glm::vec3(0, -1, 0),
+        .scale     = 1.f,
+        .direction = glm::vec3(-1, 0, 0),
+    };
 
     // Camera
     FreeflyCamera camera;
 
     // Boids instance
-    std::vector<Boid>             allBoids = createBoids();
-    std::chrono::duration<double> elapsed_update_seconds{}; // TODO move into a Perfs class
-    std::chrono::duration<double> elapsed_draw_seconds{};   // TODO move into a Perfs class
+    std::vector<Boid> allBoids = createBoids();
+    Perfs             boidPerformances{};
 
     // Obstacles
     std::vector<Obstacle> allObstacles;
@@ -108,22 +105,13 @@ int main(int argc, char* argv[])
         ImGui::Begin("Boids parameters");
         ImGui::SliderFloat("Boids speed", &speed, 0.f, 2.f);
 
-        ImGui::Text("Elapsed update time: %fms", elapsed_update_seconds.count() * 1000.0);
-        ImGui::Text("Elapsed draw time: %fms", elapsed_draw_seconds.count() * 1000.0);
+        boidPerformances.ImGui();
 
         // Boids
         ImguiBoids(allBoids);
 
         // Forces
-        {
-            if (globalForces.ImGui())
-            {
-                for (auto& boid : allBoids)
-                {
-                    boid.setForces(globalForces);
-                }
-            }
-        }
+        globalForces.ImGui();
 
         // Obstacles
         if (ImGui::Button("Clear Obstacles"))
@@ -144,15 +132,11 @@ int main(int argc, char* argv[])
         const glm::mat4 ViewMatrix = camera.getViewMatrix();
         const auto      cameraPos  = glm::vec3(ViewMatrix[3]);
 
-        // TODO move to a function
-        std::vector<ModelParams> paramsAllBoids{allBoids.size()};
-        for (auto const& boid : allBoids)
-        {
-            ModelParams params = boid.computeParams();
-            params.lod         = updateLOD(cameraPos, params.center);
-            paramsAllBoids.emplace_back(params);
-        }
-        ////////
+        // Compute boids parameters for drawing model
+        const std::vector<ModelParams> paramsAllBoids = computeBoidsParams(allBoids, cameraPos);
+
+        // Compute obstacles parameters for drawing model
+        std::vector<ModelParams> paramsAllObstacles = computeObstaclesParams(allObstacles, cameraPos);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
@@ -177,40 +161,42 @@ int main(int argc, char* argv[])
         shader.set("u_lightsPos[1]", pointLightPositions[1]);
 
         {
+            // Boids need to be in the box so the area of moving must be smaller than the actual box size
             const float backupCellSize = cellParams.scale;
-            cellParams.scale *= 1.5f; // TODO expliquer :  on a besoin d'avoir nos boids qui resten /....
+            cellParams.scale *= 1.5f;
             cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
             cellParams.scale = backupCellSize;
         }
 
-        auto start = std::chrono::system_clock::now();
+        boidPerformances.startTimer();
 
         for (auto& boid : allBoids)
         {
             boid.avoidWalls(cellParams.scale);
             boid.avoidObstacles(allObstacles);
-            boid.updateCenter(speed, allBoids);
+            boid.updateCenter(speed, globalForces, allBoids);
         }
 
-        elapsed_update_seconds = std::chrono::system_clock::now() - start;
+        boidPerformances.TimerComputeBoids();
 
-        start = std::chrono::system_clock::now();
+        boidPerformances.startTimer();
+
         for (auto const& boid : paramsAllBoids)
         {
             modelBoidsLOD.drawModel(shader, ProjMatrix, ViewMatrix, boid);
         }
-        elapsed_draw_seconds = std::chrono::system_clock::now() - start;
 
-        for (auto& obstacle : allObstacles) // TODO should be const
+        boidPerformances.TimerDrawBoids();
+
+        for (auto const& obstacle : paramsAllObstacles)
         {
-            // TODO fix it in another draw way
-            // obstacle.draw(shader, ProjMatrix, ViewMatrix);
+            modelObstacleLOD.drawModel(shader, ProjMatrix, ViewMatrix, obstacle);
         }
     };
 
     // Obstacles controls
     ctx.mouse_pressed = [&](p6::MouseButton button) {
-        addObstacle(button, allObstacles, modelObstacleLOD);
+        addObstacle(button, allObstacles);
     };
 
     // Camera controls

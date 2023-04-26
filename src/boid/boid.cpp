@@ -16,47 +16,25 @@ Boid::Boid(glm::vec3 center, float radius)
     m_direction = glm::normalize(glm::vec3(p6::random::number(), p6::random::number(), p6::random::number())); // We know it not perfect but its ok :)
 };
 
-void Boid::setForces(Forces forces)
-{
-    m_forces = forces;
-}
-
-// void Boid::draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view)
-// {
-//     // update LOD
-//     updateLOD(view);
-
-//     // 3D drawing
-//     m_model.drawModel(
-//         shader,
-//         projection,
-//         view,
-//         ModelParams{
-//             m_centered_coord,
-//             m_radius,
-//             m_direction,
-//             m_lod}
-//     );
-// }
-
 ModelParams Boid::computeParams() const
 {
     return ModelParams{
-        m_centered_coord,
-        m_radius,
-        m_direction};
+        .center    = m_centered_coord,
+        .scale     = m_radius,
+        .direction = m_direction,
+    };
 }
 
-void Boid::updateCenter(float speed, const std::vector<Boid>& neighbors)
+void Boid::updateCenter(const float& speed, const Forces& forces, const std::vector<Boid>& neighbors)
 {
     // Add cohesion process
-    m_direction += this->cohesion(neighbors) * m_forces.m_cohesionForce * speed;
+    m_direction += this->cohesion(neighbors) * forces.m_cohesionForce * speed;
 
     // Add separation process
-    m_direction += this->separation(neighbors) * speed * m_forces.m_separationForce;
+    m_direction += this->separation(neighbors) * speed * forces.m_separationForce;
 
     // Add alignment process
-    m_direction += this->alignment(neighbors) * speed * m_forces.m_alignmentForce;
+    m_direction += this->alignment(neighbors) * speed * forces.m_alignmentForce;
 
     // Limit the speed
     m_direction = glm::normalize(m_direction);
@@ -81,16 +59,16 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
         // Calculate distance
         float distance = this->distance(boid);
 
-        if (distance < maxDistance) // TODO continue
-        {
-            // Difference in term of position not length
-            glm::vec3 difference = this->m_centered_coord - boid.m_centered_coord;
+        if (distance > maxDistance)
+            continue;
 
-            glm::vec3 move = glm::normalize(difference) / static_cast<float>(difference.length());
+        // Difference in term of position not length
+        glm::vec3 difference = this->m_centered_coord - boid.m_centered_coord;
 
-            total += move;
-            count++;
-        }
+        glm::vec3 move = glm::normalize(difference) / static_cast<float>(difference.length());
+
+        total += move;
+        count++;
     }
 
     if (count != 0)
@@ -263,4 +241,17 @@ void ImguiBoids(std::vector<Boid>& boids)
             );
         }
     }
+}
+
+std::vector<ModelParams> computeBoidsParams(const std::vector<Boid>& allBoids, const glm::vec3& viewMatrixPosition)
+{
+    std::vector<ModelParams> paramsAllBoids{allBoids.size()};
+    for (auto const& boid : allBoids)
+    {
+        ModelParams params = boid.computeParams();
+        params.lod         = updateLOD(viewMatrixPosition, params.center);
+        paramsAllBoids.emplace_back(params);
+    }
+
+    return paramsAllBoids;
 }

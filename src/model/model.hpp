@@ -22,14 +22,13 @@ private:
     std::vector<glm::vec2> m_outUvs{};
     std::vector<glm::vec3> m_outNormals{};
 
-    VAO m_vao;
-    VBO m_vboPositions;
-    VBO m_vboNormals;
-    VBO m_vboTexCoords;
+    VAO m_vao{};
+    VBO m_vboPositions{};
+    VBO m_vboNormals{};
+    VBO m_vboTexCoords{};
 
 public:
-    Model() = default;
-    Model(std::string urlPath);
+    explicit Model(std::string urlPath);
 
     void loadObj();
     void initModel();

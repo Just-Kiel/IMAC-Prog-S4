@@ -19,23 +19,14 @@ private:
 
     glm::vec3 m_direction{1.f, 0.f, 0.f};
 
-    Forces m_forces{};
-
-    // TODO(Aurore): Instead draw with parameter and separate LOD from BOID
-
 public:
     Boid(glm::vec3 center, float radius);
 
     inline float radius() const { return m_radius; }
 
-    void setForces(Forces forces); // TODO don't store forces in boid, just pass it to updateCenter
-
-    //  TODO rendering params and model
-    // void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
-
     ModelParams computeParams() const;
 
-    void updateCenter(float speed, const std::vector<Boid>& neighbors);
+    void updateCenter(const float& speed, const Forces& forces, const std::vector<Boid>& neighbors);
 
     glm::vec3 separation(const std::vector<Boid>& neighbors);
     glm::vec3 alignment(const std::vector<Boid>& neighbors);
@@ -52,4 +43,5 @@ public:
     void rotateRight();
 };
 
-void ImguiBoids(std::vector<Boid>& boids);
+void                     ImguiBoids(std::vector<Boid>& boids);
+std::vector<ModelParams> computeBoidsParams(const std::vector<Boid>& allBoids, const glm::vec3& viewMatrixPosition);

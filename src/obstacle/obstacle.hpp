@@ -12,16 +12,10 @@ private:
 
     float m_radius;
 
-    ModelsLOD& m_model;
-
-    LOD m_lod = LOD::LOD_LOW;
-
 public:
-    Obstacle(glm::vec3 position, float radius, ModelsLOD& model);
+    Obstacle(glm::vec3 position, float radius);
 
-    ~Obstacle() = default;
-
-    void draw(const p6::Shader& shader, glm::mat4& projection, glm::mat4& view);
+    ModelParams computeParams() const;
 
     void updateLOD(glm::mat4& view);
 
@@ -30,4 +24,5 @@ public:
     glm::vec3 getPosition() const;
 };
 
-void addObstacle(p6::MouseButton& button, std::vector<Obstacle>& allObstacles, ModelsLOD& modelObstacleLOD);
+void                     addObstacle(p6::MouseButton& button, std::vector<Obstacle>& allObstacles);
+std::vector<ModelParams> computeObstaclesParams(const std::vector<Obstacle>& allObstacles, const glm::vec3& viewMatrixPosition);

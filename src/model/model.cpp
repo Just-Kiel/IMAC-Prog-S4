@@ -17,6 +17,8 @@ void computeDirectionVectors(glm::vec3& frontAxis, glm::vec3& leftAxis, glm::vec
 Model::Model(std::string urlPath)
     : m_urlPath(std::move(urlPath))
 {
+    loadObj();
+    initModel();
 }
 
 void Model::loadObj()

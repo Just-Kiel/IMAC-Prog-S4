@@ -8,10 +8,7 @@ private:
     std::vector<Model> m_models;
 
 public:
-    ModelsLOD() = default;
-    ModelsLOD(std::array<std::string, LOD_COUNT> modelsPaths);
-
-    void initModels();
+    explicit ModelsLOD(std::array<std::string, LOD_COUNT> modelsPaths);
 
     void drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params);
 };
