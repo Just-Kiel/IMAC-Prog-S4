@@ -41,7 +41,7 @@
 
 
 # TO DO (19/04):
-- [ ] Review de Jules
+- [x] Review de Jules
 - [ ] Rapport
 - [ ] Arpenteur
   - [ ] Contraindre les mouvements
@@ -52,7 +52,7 @@
 - [ ] Cube global environnement
   - [ ] Cube Map ????
 - [ ] Obstacles par défaut
-- [ ] Shadow Mapping
+- [x] Shadow Mapping
 - [ ] Handle Material or texture
 - [ ] Instancing of draw calls
 - [ ] Obstacles :

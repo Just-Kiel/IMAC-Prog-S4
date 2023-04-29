@@ -16,6 +16,7 @@
 #include "obstacle/obstacle.hpp"
 #include "p6/p6.h"
 #include "perfs/perfs.hpp"
+#include "shadowMapping/shadowMapping.hpp"
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
@@ -72,7 +73,6 @@ int main(int argc, char* argv[])
     );
 
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
 
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
@@ -91,6 +91,9 @@ int main(int argc, char* argv[])
 
     // Camera
     FreeflyCamera camera;
+
+    // Shadow mapping
+    ShadowMapping shadowMapping({"shaders/framebuffer.vs.glsl", "shaders/framebuffer.fs.glsl"}, ctx.main_canvas_width(), ctx.main_canvas_height());
 
     // Boids instance
     std::vector<Boid> allBoids = createBoids();
@@ -131,6 +134,7 @@ int main(int argc, char* argv[])
         // For both shadow mapping and rendering
         const glm::mat4 ViewMatrix = camera.getViewMatrix();
         const auto      cameraPos  = glm::vec3(ViewMatrix[3]);
+        const glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
 
         // Compute boids parameters for drawing model
         const std::vector<ModelParams> paramsAllBoids = computeBoidsParams(allBoids, cameraPos);
@@ -138,9 +142,24 @@ int main(int argc, char* argv[])
         // Compute obstacles parameters for drawing model
         std::vector<ModelParams> paramsAllObstacles = computeObstaclesParams(allObstacles, cameraPos);
 
+        // Positions Lights
+        std::array pointLightPositions = {
+            glm::vec3(0.5f, 0.5f, 0.0f), // light that displays the shadow map
+            glm::vec3(-0.7f, -0.2f, -2.0f),
+        };
+
+        const glm::vec3 lightDir = glm::vec3(0.f, -1.f, 0.2f);
+
+        // Shadow Mapping
+        glm::mat4 lightView = glm::lookAt(pointLightPositions[0], pointLightPositions[0] + lightDir, glm::vec3(0, 1, 0));
+
+        const glm::mat4 lightProjection  = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        glm::mat4       lightSpaceMatrix = lightProjection * lightView;
+        shadowMapping.render(modelBoidsLOD, paramsAllBoids, ProjMatrix, lightSpaceMatrix);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
-        const glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
+        shader.set("uLightSpaceMatrix", lightSpaceMatrix);
 
         // lighting (material)
         shader.set("uKd", glm::vec3{0.9f, 0.8f, 0.9f});
@@ -148,12 +167,7 @@ int main(int argc, char* argv[])
         shader.set("uShininess", 100.f);
 
         // lighting (light)
-        shader.set("uLightIntensity", glm::vec3{2.f, 2.f, 2.f});
-
-        // Positions Lights
-        std::array pointLightPositions = {
-            glm::vec3(2.3f, -3.3f, -4.0f),
-            glm::vec3(-0.7f, -0.2f, -2.0f)};
+        shader.set("uLightIntensity", glm::vec3{1.f, 1.f, 1.f});
 
         // point light 1
         shader.set("u_lightsPos[0]", pointLightPositions[0]);
@@ -164,6 +178,7 @@ int main(int argc, char* argv[])
             // Boids need to be in the box so the area of moving must be smaller than the actual box size
             const float backupCellSize = cellParams.scale;
             cellParams.scale *= 1.5f;
+            shadowMapping.activateTexture(shader);
             cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
             cellParams.scale = backupCellSize;
         }
@@ -183,6 +198,7 @@ int main(int argc, char* argv[])
 
         for (auto const& boid : paramsAllBoids)
         {
+            shadowMapping.activateTexture(shader);
             modelBoidsLOD.drawModel(shader, ProjMatrix, ViewMatrix, boid);
         }
 
@@ -190,6 +206,7 @@ int main(int argc, char* argv[])
 
         for (auto const& obstacle : paramsAllObstacles)
         {
+            shadowMapping.activateTexture(shader);
             modelObstacleLOD.drawModel(shader, ProjMatrix, ViewMatrix, obstacle);
         }
     };

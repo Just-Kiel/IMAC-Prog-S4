@@ -171,11 +171,6 @@ void Model::initModel()
 
 void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params)
 {
-    glm::mat4 MVMatrix = view;
-
-    // Translate the model to the position
-    MVMatrix = glm::translate(MVMatrix, params.center);
-
     // Rotate the model to the correct direction
     glm::vec3 frontAxis, leftAxis, upAxis;
 
@@ -189,10 +184,12 @@ void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, con
         glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)
     );
 
-    MVMatrix = MVMatrix * rotationMatrix;
+    glm::mat4 ModelMatrix = glm::mat4(1.0f);
+    ModelMatrix           = glm::translate(ModelMatrix, params.center);
+    ModelMatrix           = ModelMatrix * rotationMatrix;
+    ModelMatrix           = glm::scale(ModelMatrix, glm::vec3{params.scale});
 
-    // Scale the model to the correct radius
-    MVMatrix = glm::scale(MVMatrix, glm::vec3{params.scale});
+    glm::mat4 MVMatrix = view * ModelMatrix;
 
     glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
@@ -202,6 +199,7 @@ void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, con
     shader.set("uMVPMatrix", MVPProduct);
     shader.set("uMVMatrix", MVMatrix);
     shader.set("uNormalMatrix", NormalMatrix);
+    shader.set("model", ModelMatrix);
 
     glBindVertexArray(*m_vao);
     glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_outVertices.size()));

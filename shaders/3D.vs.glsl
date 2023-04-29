@@ -7,10 +7,13 @@ layout(location = 2) in vec2 aVertexTexCoords;
 uniform mat4 uMVPMatrix;
 uniform mat4 uMVMatrix;
 uniform mat4 uNormalMatrix;
+uniform mat4 uLightSpaceMatrix;
+uniform mat4 model;
 
 out vec3 vPosition_vs;
 out vec3 vNormal_vs;
 out vec2 vTexCoords;
+out vec4 vFragPosLightSpace;
 
 void main() {
     // Passage en coordonnées homogènes
@@ -21,6 +24,7 @@ void main() {
     vPosition_vs = vec3(uMVMatrix * vertexPosition);
     vNormal_vs = vec3(uNormalMatrix * vertexNormal);
     vTexCoords = aVertexTexCoords;
+    vFragPosLightSpace = uLightSpaceMatrix * model * vertexPosition;
 
     // Calcul de la position projetée
     gl_Position = uMVPMatrix * vertexPosition;
