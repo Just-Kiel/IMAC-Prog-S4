@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     glEnable(GL_DEPTH_TEST);
 
     // Models initialization
-    ModelsLOD modelBoidsLOD({"assets/models/untitled.obj", "assets/models/test.obj", "assets/models/cone.obj"});
+    ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
 
     // Models initialization
     ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});

@@ -46,7 +46,7 @@
 - [ ] Arpenteur
   - [ ] Contraindre les mouvements
 - [ ] Modélisation
-  - [ ] Boids (Paperplane)
+  - [x] Boids (Paperplane)
   - [ ] Arpenteur
   - [ ] Obstacles
 - [ ] Cube global environnement
