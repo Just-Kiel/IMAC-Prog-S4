@@ -7,7 +7,7 @@
 
 class ShadowMapping {
 private:
-    p6::Shader  m_shader{""};
+    p6::Shader  m_shader;
     Framebuffer m_framebuffer{0, 0};
 
 public:

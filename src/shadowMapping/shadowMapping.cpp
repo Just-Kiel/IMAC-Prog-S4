@@ -5,9 +5,8 @@
 #include "opengl/framebufferOpenGl.hpp"
 
 ShadowMapping::ShadowMapping(std::array<std::string, 2> shaderPaths, const int& width, const int& height)
-    : m_framebuffer(Framebuffer(width, height))
+    : m_shader(p6::load_shader(shaderPaths[0], shaderPaths[1])), m_framebuffer(Framebuffer(width, height))
 {
-    m_shader = p6::load_shader(shaderPaths[0], shaderPaths[1]);
 }
 
 void ShadowMapping::render(ModelsLOD& casterModel, const std::vector<ModelParams>& castersParams, const glm::mat4& ProjMatrix, const glm::mat4& lightSpaceMatrix)
