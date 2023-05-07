@@ -27,6 +27,7 @@ void Model::loadObj()
     std::vector<unsigned int> uvIndices;
     std::vector<unsigned int> normalIndices;
     std::vector<glm::vec3>    tempVertices;
+    std::vector<glm::vec3>    tempColors;
     std::vector<glm::vec2>    tempUvs;
     std::vector<glm::vec3>    tempNormals;
 
@@ -53,6 +54,18 @@ void Model::loadObj()
             file >> vertex.z;
 
             tempVertices.push_back(vertex);
+
+            // Check if end of line
+            if (file.peek() == '\n')
+                continue;
+
+            // Parse line with 3 floats for color
+            glm::vec3 color(0.0f, 0.0f, 0.0f);
+            file >> color.x;
+            file >> color.y;
+            file >> color.z;
+
+            tempColors.push_back(color);
         }
         else if (lineHeader == "vt")
         {
@@ -120,6 +133,21 @@ void Model::loadObj()
     {
         glm::vec3 vertex = tempVertices[vertexIndex - 1];
         m_outVertices.push_back(vertex);
+
+        if (tempColors.empty())
+            continue;
+
+        glm::vec3 color = tempColors[vertexIndex - 1];
+        m_outColors.push_back(color);
+    }
+
+    // If no color, set white
+    if (tempColors.empty())
+    {
+        for (unsigned int i = 0; i < m_outVertices.size(); ++i)
+        {
+            m_outColors.emplace_back(1.0f, 1.0f, 1.0f);
+        }
     }
 
     for (unsigned int uvIndex : uvIndices)
@@ -145,6 +173,9 @@ void Model::initModel()
 
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboTexCoords);
     glBufferData(GL_ARRAY_BUFFER, m_outUvs.size() * sizeof(glm::vec2), m_outUvs.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboColors);
+    glBufferData(GL_ARRAY_BUFFER, m_outColors.size() * sizeof(glm::vec3), m_outColors.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(*m_vao);
@@ -152,19 +183,24 @@ void Model::initModel()
     const GLuint VERTEX_ATTR_POSITION   = 0;
     const GLuint VERTEX_ATTR_NORMAL     = 1;
     const GLuint VERTEX_ATTR_TEX_COORDS = 2;
+    const GLuint VERTEX_ATTR_COLOR      = 3;
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
     glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
     glEnableVertexAttribArray(VERTEX_ATTR_TEX_COORDS);
+    glEnableVertexAttribArray(VERTEX_ATTR_COLOR);
 
     // Specification
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboPositions);
-    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
 
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboNormals);
-    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
 
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboTexCoords);
-    glVertexAttribPointer(VERTEX_ATTR_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
+    glVertexAttribPointer(VERTEX_ATTR_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), nullptr);
+
+    glBindBuffer(GL_ARRAY_BUFFER, *m_vboColors);
+    glVertexAttribPointer(VERTEX_ATTR_COLOR, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }

@@ -4,6 +4,7 @@ in vec3 vPosition_vs;
 in vec3 vNormal_vs;
 //in vec2 vTexCoords;
 in vec4 vFragPosLightSpace;
+in vec3 vColor;
 
 
 const int NB_LIGHTS = 2;
@@ -59,30 +60,9 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // check whether current frag pos is in shadow
     float bias = max(0.05 * (1.0 - dot(vNormal_vs, uLightDir_vs)), 0.005);
 
-    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0; 
-
-    
-
-
-    // PCF
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;
-        }
-    }
-    shadow /= 9.0;
-
-    if(projCoords.z > 1.0)
-        shadow = 0.0;
-
-
+    // // PCF
     // Handle point light
-    shadow = 0.0;
+    float shadow = 0.0;
     vec3 normal = normalize(vNormal_vs);
     vec3 lightDir = normalize(u_lightsPos[0] - vPosition_vs);
     bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
@@ -114,7 +94,7 @@ void main() {
     // calculate shadow
     float shadow = ShadowCalculation(vFragPosLightSpace);     
     //shadow = 0.0;  
-    vec3 lighting = ((1.0 - shadow) * (ambient + lightRes));
+    vec3 lighting = ((1.0 - shadow) * vColor *(ambient + lightRes));
 
     fFragColor = vec4(lighting, 1.0);
 }

@@ -54,18 +54,18 @@ void cameraKeyControls(const p6::Key& key, FreeflyCamera& camera)
 {
     if (key.physical == GLFW_KEY_A || key.physical == GLFW_KEY_LEFT)
     {
-        camera.moveLeft(5.f);
+        camera.moveLeft(0.5f);
     }
     else if (key.physical == GLFW_KEY_D || key.physical == GLFW_KEY_RIGHT)
     {
-        camera.moveLeft(-5.f);
+        camera.moveLeft(-0.5f);
     }
     else if (key.physical == GLFW_KEY_W || key.physical == GLFW_KEY_UP)
     {
-        camera.moveFront(1.f);
+        camera.moveFront(0.5f);
     }
     else if (key.physical == GLFW_KEY_S || key.physical == GLFW_KEY_DOWN)
     {
-        camera.moveFront(-1.f);
+        camera.moveFront(-0.5f);
     }
 }

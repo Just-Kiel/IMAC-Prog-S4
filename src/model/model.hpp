@@ -21,11 +21,13 @@ private:
     std::vector<glm::vec3> m_outVertices{};
     std::vector<glm::vec2> m_outUvs{};
     std::vector<glm::vec3> m_outNormals{};
+    std::vector<glm::vec3> m_outColors{};
 
     VAO m_vao{};
     VBO m_vboPositions{};
     VBO m_vboNormals{};
     VBO m_vboTexCoords{};
+    VBO m_vboColors{};
 
 public:
     explicit Model(std::string urlPath);
