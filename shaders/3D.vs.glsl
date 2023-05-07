@@ -12,6 +12,7 @@ uniform mat4 uLightSpaceMatrix;
 uniform mat4 model;
 
 out vec3 vPosition_vs;
+out vec3 vPosition_world;
 out vec3 vNormal_vs;
 out vec2 vTexCoords;
 out vec4 vFragPosLightSpace;
@@ -24,6 +25,7 @@ void main() {
 
     // Calcul des valeurs de sortie
     vPosition_vs = vec3(uMVMatrix * vertexPosition);
+    vPosition_world = vec3(model * vertexPosition);
     vNormal_vs = vec3(uNormalMatrix * vertexNormal);
     vTexCoords = aVertexTexCoords;
     vFragPosLightSpace = uLightSpaceMatrix * model * vertexPosition;
