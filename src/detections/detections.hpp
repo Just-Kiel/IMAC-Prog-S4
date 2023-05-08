@@ -1,8 +1,8 @@
 #include "boid/boid.hpp"
 
-void avoidUpWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
-void avoidDownWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
-void avoidLeftWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
-void avoidRightWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
-void avoidFrontWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
-void avoidBackWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
+bool avoidUpWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& upDetection, const float& radius);
+bool avoidDownWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& downDetection, const float& radius);
+bool avoidLeftWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
+bool avoidRightWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
+bool avoidFrontWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);
+bool avoidBackWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius);

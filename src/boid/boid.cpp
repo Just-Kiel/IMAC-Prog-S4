@@ -170,7 +170,7 @@ void Boid::avoidObstacles(const std::vector<Obstacle>& allObs)
     }
 }
 
-void Boid::avoidWalls(const float& radius)
+bool Boid::avoidWalls(const float& radius)
 {
     // Avoid going outside of window
     // Look forward head at a set distance
@@ -182,17 +182,18 @@ void Boid::avoidWalls(const float& radius)
 
     glm::vec3 rightDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {0, 1, 0})) * m_radius) + m_centered_coord;
 
+    glm::vec3 upDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(45.f), {1, 0, 0})) * m_radius) + m_centered_coord;
+
+    glm::vec3 downDetection = (glm::normalize(glm::rotate(m_direction, glm::radians(-45.f), {1, 0, 0})) * m_radius) + m_centered_coord;
+
     // Y detection
-    avoidUpWall(*this, frontDetection, rightDetection, radius);
-    avoidDownWall(*this, frontDetection, rightDetection, radius);
+    return avoidUpWall(*this, frontDetection, upDetection, radius) || avoidDownWall(*this, frontDetection, downDetection, radius) ||
 
-    // X detection
-    avoidLeftWall(*this, frontDetection, rightDetection, radius);
-    avoidRightWall(*this, frontDetection, rightDetection, radius);
+           // X detection
+           avoidLeftWall(*this, frontDetection, rightDetection, radius) || avoidRightWall(*this, frontDetection, rightDetection, radius) ||
 
-    // Z detection
-    avoidFrontWall(*this, frontDetection, rightDetection, radius);
-    avoidBackWall(*this, frontDetection, rightDetection, radius);
+           // Z detection
+           avoidFrontWall(*this, frontDetection, rightDetection, radius) || avoidBackWall(*this, frontDetection, rightDetection, radius);
 }
 
 void Boid::rotateLeft()
@@ -203,6 +204,16 @@ void Boid::rotateLeft()
 void Boid::rotateRight()
 {
     m_direction = glm::rotate(m_direction, glm::radians(15.f), {0, 1, 0});
+}
+
+void Boid::rotateUp()
+{
+    m_direction = glm::rotate(m_direction, glm::radians(15.f), {1, 0, 0});
+}
+
+void Boid::rotateDown()
+{
+    m_direction = glm::rotate(m_direction, glm::radians(-15.f), {1, 0, 0});
 }
 
 void ImguiBoids(std::vector<Boid>& boids)

@@ -19,6 +19,8 @@ public:
     void computeDirectionVectors();
     void moveLeft(float t);
     void moveFront(float t);
+    void moveUp(float t);
+    void moveDown(float t);
 
     void rotateLeft(float degrees);
     void rotateUp(float degrees);
@@ -26,4 +28,4 @@ public:
     glm::mat4 getViewMatrix() const;
 };
 
-void cameraKeyControls(const p6::Key& key, FreeflyCamera& camera);
+void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime);

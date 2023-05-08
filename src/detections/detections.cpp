@@ -1,36 +1,40 @@
 #include "detections.hpp"
 
-void avoidUpWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
+bool avoidUpWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& upDetection, const float& radius)
 {
     if (frontDetec.y > radius)
     {
-        if (rightDetec.y > radius)
+        if (upDetection.y > radius)
         {
-            currentBoid.rotateLeft();
+            currentBoid.rotateDown();
         }
         else
         {
-            currentBoid.rotateRight();
+            currentBoid.rotateUp();
         }
+        return true;
     }
+    return false;
 }
 
-void avoidDownWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
+bool avoidDownWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& downDetection, const float& radius)
 {
     if (frontDetec.y < -radius)
     {
-        if (rightDetec.y < -radius)
+        if (downDetection.y < -radius)
         {
-            currentBoid.rotateLeft();
+            currentBoid.rotateUp();
         }
         else
         {
-            currentBoid.rotateRight();
+            currentBoid.rotateDown();
         }
+        return true;
     }
+    return false;
 }
 
-void avoidLeftWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
+bool avoidLeftWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
 {
     if (frontDetec.x < -radius)
     {
@@ -42,10 +46,12 @@ void avoidLeftWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::ve
         {
             currentBoid.rotateRight();
         }
+        return true;
     }
+    return false;
 }
 
-void avoidRightWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
+bool avoidRightWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
 {
     if (frontDetec.x > radius)
     {
@@ -57,10 +63,12 @@ void avoidRightWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::v
         {
             currentBoid.rotateRight();
         }
+        return true;
     }
+    return false;
 }
 
-void avoidFrontWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
+bool avoidFrontWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
 {
     if (frontDetec.z < -radius)
     {
@@ -72,10 +80,12 @@ void avoidFrontWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::v
         {
             currentBoid.rotateRight();
         }
+        return true;
     }
+    return false;
 }
 
-void avoidBackWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
+bool avoidBackWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::vec3& rightDetec, const float& radius)
 {
     if (frontDetec.z > radius)
     {
@@ -87,5 +97,7 @@ void avoidBackWall(Boid& currentBoid, const glm::vec3& frontDetec, const glm::ve
         {
             currentBoid.rotateRight();
         }
+        return true;
     }
+    return false;
 }

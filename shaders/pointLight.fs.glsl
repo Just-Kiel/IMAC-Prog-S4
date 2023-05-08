@@ -3,7 +3,7 @@
 in vec3 vPosition_vs;
 in vec3 vPosition_world;
 in vec3 vNormal_vs;
-//in vec2 vTexCoords;
+in vec2 vTexCoords;
 in vec4 vFragPosLightSpace;
 in vec3 vColor;
 
@@ -20,6 +20,10 @@ uniform vec3 uLightIntensity;
 // Depth computed from light
 uniform vec3 uLightDir_vs;
 uniform sampler2D shadowMap;
+
+// Texture
+uniform bool uUseTexture;
+uniform sampler2D uTexture;
 
 out vec4 fFragColor;
 
@@ -84,18 +88,22 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() {
     // lighting
-    vec3 ambient = vec3(0.2);
+    vec4 ambient = vec4(0.2);
     vec3 lightRes = vec3(0.0);
     for(int i = 0; i < NB_LIGHTS; i++){
         lightRes += blinnPhong(u_lightsPos[i]);
     }	
-    fFragColor = vec4(lightRes, 1.0);
 
-    
     // calculate shadow
     float shadow = ShadowCalculation(vFragPosLightSpace);     
-    //shadow = 0.0;  
-    vec3 lighting = ((1.0 - shadow) * vColor *(ambient + lightRes));
+    // shadow = 0.0;  
 
-    fFragColor = vec4(lighting, 1.0);
+    // final color
+    vec4 color = vec4(vColor, 1.0);
+    if (uUseTexture)
+        color *= texture2D(uTexture, vTexCoords*4);
+
+    vec4 lighting = ((1.0 - shadow) *(ambient + vec4(lightRes,1.0)))* color;
+
+    fFragColor = lighting;
 }

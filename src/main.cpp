@@ -14,6 +14,7 @@
 #include "model/model.hpp"
 #include "model/modelsLOD.hpp"
 #include "obstacle/obstacle.hpp"
+#include "opengl/textureOpenGl.hpp"
 #include "p6/p6.h"
 #include "perfs/perfs.hpp"
 #include "shadowMapping/shadowMapping.hpp"
@@ -73,6 +74,8 @@ int main(int argc, char* argv[])
     );
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
@@ -88,6 +91,10 @@ int main(int argc, char* argv[])
         .scale     = 1.f,
         .direction = glm::vec3(-1, 0, 0),
     };
+
+    img::Image cellTex = p6::load_image_buffer("assets/textures/grillage.png");
+    Texture    cellTexture{};
+    cellTexture.image2D(cellTex.width(), cellTex.height(), cellTex.data(), GL_RGBA, GL_UNSIGNED_BYTE);
 
     // Camera
     FreeflyCamera camera;
@@ -159,6 +166,7 @@ int main(int argc, char* argv[])
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
+        shader.set("uUseTexture", false);
         shader.set("uLightSpaceMatrix", lightSpaceMatrix);
 
         // lighting (material)
@@ -174,22 +182,22 @@ int main(int argc, char* argv[])
         // point light 2
         shader.set("u_lightsPos[1]", pointLightPositions[1]);
 
-        {
-            // Boids need to be in the box so the area of moving must be smaller than the actual box size
-            const float backupCellSize = cellParams.scale;
-            cellParams.scale *= 1.5f;
-            shadowMapping.activateTexture(shader);
-            cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
-            cellParams.scale = backupCellSize;
-        }
-
         boidPerformances.startTimer();
 
         for (auto& boid : allBoids)
         {
-            boid.avoidWalls(cellParams.scale);
+            Forces tempForces = globalForces;
             boid.avoidObstacles(allObstacles);
+            if (boid.avoidWalls(cellParams.scale))
+            {
+                globalForces = Forces{
+                    .m_separationForce = 0.f,
+                    .m_cohesionForce   = 0.f,
+                    .m_alignmentForce  = 0.f,
+                };
+            }
             boid.updateCenter(speed, globalForces, allBoids);
+            globalForces = tempForces;
         }
 
         boidPerformances.TimerComputeBoids();
@@ -209,6 +217,24 @@ int main(int argc, char* argv[])
             shadowMapping.activateTexture(shader);
             modelObstacleLOD.drawModel(shader, ProjMatrix, ViewMatrix, obstacle);
         }
+
+        {
+            shader.set("uUseTexture", true);
+            shader.set("uTexture", 1);
+            cellTexture.activate(1);
+
+            // Boids need to be in the box so the area of moving must be smaller than the actual box size
+            const float backupCellSize = cellParams.scale;
+            cellParams.scale += 1.5f;
+            shadowMapping.activateTexture(shader);
+            cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
+            cellParams.scale = backupCellSize;
+        }
+
+        // Camera controls
+        {
+            cameraKeyControls(ctx, camera, ctx.delta_time());
+        }
     };
 
     // Obstacles controls
@@ -220,10 +246,6 @@ int main(int argc, char* argv[])
     ctx.mouse_dragged = [&](p6::MouseDrag drag) {
         camera.rotateLeft(drag.delta.x * 50.f);
         camera.rotateUp(drag.delta.y * 50.f);
-    };
-
-    ctx.key_pressed = [&](const p6::Key& key) {
-        cameraKeyControls(key, camera);
     };
 
     // Should be done last. It starts the infinite loop.

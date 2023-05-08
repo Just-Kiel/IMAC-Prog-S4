@@ -17,10 +17,6 @@ LOD updateLOD(glm::vec3 cameraPosition, glm::vec3 modelPosition)
     {
         lod = LOD::LOD_MEDIUM;
     }
-    else
-    {
-        lod = LOD::LOD_LOW;
-    }
 
     return lod;
 }

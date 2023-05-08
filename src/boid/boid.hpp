@@ -36,11 +36,15 @@ public:
 
     void avoidObstacles(const std::vector<Obstacle>& allObstacles);
 
-    void avoidWalls(const float& radius);
+    bool avoidWalls(const float& radius);
 
     void rotateLeft();
 
     void rotateRight();
+
+    void rotateUp();
+
+    void rotateDown();
 };
 
 void                     ImguiBoids(std::vector<Boid>& boids);

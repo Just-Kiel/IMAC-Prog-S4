@@ -45,6 +45,7 @@
 - [ ] Rapport
 - [ ] Arpenteur
   - [ ] Contraindre les mouvements
+  - [x] Improve camera
 - [ ] Modélisation
   - [x] Boids (Paperplane)
   - [ ] Arpenteur
@@ -53,8 +54,10 @@
   - [ ] Cube Map ????
 - [ ] Obstacles par défaut
 - [x] Shadow Mapping
-- [ ] Handle Material or texture
+- [x] Handle Material or texture
+  - [ ] Improve cube texture (with mapped uv and stuff)
 - [ ] Instancing of draw calls
+- [ ] Option to display or not the shadows
 - [ ] Obstacles :
     - [ ] Handle collisions
     - [ ] Handle creation (click)

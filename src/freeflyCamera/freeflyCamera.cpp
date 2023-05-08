@@ -1,4 +1,5 @@
 #include "freeflyCamera.hpp"
+#include "GLFW/glfw3.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "p6/p6.h"
 
@@ -33,6 +34,16 @@ void FreeflyCamera::moveFront(float t)
     m_Position += t * m_FrontVector;
 }
 
+void FreeflyCamera::moveUp(float t)
+{
+    m_Position += t * glm::vec3(0.f, 1.f, 0.f);
+}
+
+void FreeflyCamera::moveDown(float t)
+{
+    m_Position -= t * glm::vec3(0.f, 1.f, 0.f);
+}
+
 void FreeflyCamera::rotateLeft(float degrees)
 {
     m_Phi += degrees;
@@ -50,22 +61,35 @@ glm::mat4 FreeflyCamera::getViewMatrix() const
     return glm::lookAt(m_Position, m_Position + m_FrontVector, m_UpVector);
 }
 
-void cameraKeyControls(const p6::Key& key, FreeflyCamera& camera)
+void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime)
 {
-    if (key.physical == GLFW_KEY_A || key.physical == GLFW_KEY_LEFT)
+    if (ctx.key_is_pressed(GLFW_KEY_A) || ctx.key_is_pressed(GLFW_KEY_LEFT))
     {
-        camera.moveLeft(0.5f);
+        camera.moveLeft(deltaTime);
     }
-    else if (key.physical == GLFW_KEY_D || key.physical == GLFW_KEY_RIGHT)
+
+    if (ctx.key_is_pressed(GLFW_KEY_D) || ctx.key_is_pressed(GLFW_KEY_RIGHT))
     {
-        camera.moveLeft(-0.5f);
+        camera.moveLeft(-deltaTime);
     }
-    else if (key.physical == GLFW_KEY_W || key.physical == GLFW_KEY_UP)
+
+    if (ctx.key_is_pressed(GLFW_KEY_W) || ctx.key_is_pressed(GLFW_KEY_UP))
     {
-        camera.moveFront(0.5f);
+        camera.moveFront(deltaTime);
     }
-    else if (key.physical == GLFW_KEY_S || key.physical == GLFW_KEY_DOWN)
+
+    if (ctx.key_is_pressed(GLFW_KEY_S) || ctx.key_is_pressed(GLFW_KEY_DOWN))
     {
-        camera.moveFront(-0.5f);
+        camera.moveFront(-deltaTime);
+    }
+
+    if (ctx.key_is_pressed(GLFW_KEY_SPACE))
+    {
+        camera.moveUp(deltaTime);
+    }
+
+    if (ctx.shift())
+    {
+        camera.moveDown(deltaTime);
     }
 }
