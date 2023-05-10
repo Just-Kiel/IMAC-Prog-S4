@@ -26,3 +26,4 @@ public:
 
 void                     addObstacle(p6::MouseButton& button, std::vector<Obstacle>& allObstacles);
 std::vector<ModelParams> computeObstaclesParams(const std::vector<Obstacle>& allObstacles, const glm::vec3& viewMatrixPosition);
+void                     obstacleImgui(std::vector<Obstacle>& allObstacles);

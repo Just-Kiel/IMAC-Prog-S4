@@ -134,3 +134,15 @@ void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float delt
 
     camera.constraintCamera(radiusCell);
 }
+
+void cameraImgui(FreeflyCamera& camera)
+{
+    if (ImGui::BeginMenu("Camera"))
+    {
+        if (ImGui::Button("Go back to the origin"))
+        {
+            camera.reset();
+        }
+        ImGui::EndMenu();
+    }
+}

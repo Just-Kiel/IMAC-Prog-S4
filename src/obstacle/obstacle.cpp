@@ -66,3 +66,15 @@ std::vector<ModelParams> computeObstaclesParams(const std::vector<Obstacle>& all
 
     return paramsAllObstacles;
 }
+
+void obstacleImgui(std::vector<Obstacle>& allObstacles)
+{
+    if (ImGui::BeginMenu("Obstacles"))
+    {
+        if (ImGui::Button("Clear Obstacles"))
+        {
+            allObstacles.clear();
+        }
+        ImGui::EndMenu();
+    }
+}

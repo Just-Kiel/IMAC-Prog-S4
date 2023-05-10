@@ -11,6 +11,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
 #include "imgui.h"
+#include "imgui/gui.hpp"
 #include "model/model.hpp"
 #include "model/modelsLOD.hpp"
 #include "obstacle/obstacle.hpp"
@@ -143,14 +144,7 @@ int main(int argc, char* argv[])
             }
 
             // Obstacles
-            if (ImGui::BeginMenu("Obstacles"))
-            {
-                if (ImGui::Button("Clear Obstacles"))
-                {
-                    allObstacles.clear();
-                }
-                ImGui::EndMenu();
-            }
+            obstacleImgui(allObstacles);
 
             // Shadows
             if (ImGui::BeginMenu("Shadows"))
@@ -163,48 +157,14 @@ int main(int argc, char* argv[])
 
             // TODO having 2 hdri and switch between them
 
-            // Go back to the origin of the camera
-            if (ImGui::BeginMenu("Camera"))
-            {
-                if (ImGui::Button("Go back to the origin"))
-                {
-                    camera.reset();
-                }
-                ImGui::EndMenu();
-            }
+            // Camera
+            cameraImgui(camera);
 
             // Controls
-            if (ImGui::BeginMenu("Help"))
-            {
-                ImGui::Text("Controls:");
-                ImGui::Text("- Left click to add an obstacle");
-
-                ImGui::Text("");
-
-                ImGui::Text("- Drag the mouse to rotate the camera");
-                ImGui::Text("- Use the arrows to move the camera or classics WASD (QZSD)");
-                ImGui::Text("- Use SPACE to go up and SHIFT to go down with the camera");
-                ImGui::EndMenu();
-            }
+            ImguiControls();
 
             // Credits
-            if (ImGui::BeginMenu("Credits"))
-            {
-                ImGui::Text("Made by:");
-                ImGui::Text("- Olivia CREPIN");
-                ImGui::Text("- Aurore LAFAURIE");
-
-                ImGui::Text("");
-
-                ImGui::Text("With the help of:");
-                ImGui::Text("- Enguerrand DE SMET");
-                ImGui::Text("- Jules FOUCHY");
-
-                ImGui::Text("");
-
-                ImGui::Text("Project made during the fourth semester at the IMAC engineering school.");
-                ImGui::EndMenu();
-            }
+            ImguiCredits();
 
             if (ImGui::MenuItem("Quit"))
             {

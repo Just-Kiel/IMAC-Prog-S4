@@ -55,7 +55,7 @@
 - [ ] Obstacles par défaut
 - [x] Shadow Mapping
 - [x] Handle Material or texture
-  - [ ] Improve cube texture (with mapped uv and stuff)
+  - [x] Improve cube texture (with mapped uv and stuff)
 - [ ] Instancing of draw calls
 - [x] Option to display or not the shadows
 - [ ] Better ImGui

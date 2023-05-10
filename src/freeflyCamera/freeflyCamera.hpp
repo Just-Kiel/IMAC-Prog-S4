@@ -32,3 +32,4 @@ public:
 };
 
 void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime, float radiusCell);
+void cameraImgui(FreeflyCamera& camera);
