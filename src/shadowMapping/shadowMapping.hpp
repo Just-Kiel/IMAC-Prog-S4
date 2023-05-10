@@ -11,6 +11,9 @@ private:
     Framebuffer m_framebuffer{0, 0};
 
 public:
+    bool m_displayShadow{true};
+
+public:
     explicit ShadowMapping(std::array<std::string, 2> shaderPaths, const int& width, const int& height);
 
     void render(ModelsLOD& casterModel, const std::vector<ModelParams>& castersParams, const glm::mat4& ProjMatrix, const glm::mat4& lightSpaceMatrix);

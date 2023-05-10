@@ -26,6 +26,9 @@ public:
     void rotateUp(float degrees);
 
     glm::mat4 getViewMatrix() const;
+
+    void reset();
+    void constraintCamera(float radius);
 };
 
-void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime);
+void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime, float radiusCell);

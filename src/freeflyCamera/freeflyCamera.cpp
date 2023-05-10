@@ -1,5 +1,6 @@
 #include "freeflyCamera.hpp"
 #include "GLFW/glfw3.h"
+#include "freeflyCamera/freeflyCamera.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "p6/p6.h"
 
@@ -56,12 +57,50 @@ void FreeflyCamera::rotateUp(float degrees)
     computeDirectionVectors();
 }
 
+void FreeflyCamera::reset()
+{
+    m_Position = glm::vec3(0.f, 0.f, 0.f);
+    m_Phi      = p6::PI;
+    m_Theta    = 0.f;
+    computeDirectionVectors();
+}
+
+void FreeflyCamera::constraintCamera(float radius)
+{
+    if (m_Position.y < -radius)
+    {
+        m_Position.y = -radius;
+    }
+    if (m_Position.y > radius)
+    {
+        m_Position.y = radius;
+    }
+
+    if (m_Position.x < -radius)
+    {
+        m_Position.x = -radius;
+    }
+    if (m_Position.x > radius)
+    {
+        m_Position.x = radius;
+    }
+
+    if (m_Position.z < -radius)
+    {
+        m_Position.z = -radius;
+    }
+    if (m_Position.z > radius)
+    {
+        m_Position.z = radius;
+    }
+}
+
 glm::mat4 FreeflyCamera::getViewMatrix() const
 {
     return glm::lookAt(m_Position, m_Position + m_FrontVector, m_UpVector);
 }
 
-void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime)
+void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime, float radiusCell)
 {
     if (ctx.key_is_pressed(GLFW_KEY_A) || ctx.key_is_pressed(GLFW_KEY_LEFT))
     {
@@ -92,4 +131,6 @@ void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float delt
     {
         camera.moveDown(deltaTime);
     }
+
+    camera.constraintCamera(radiusCell);
 }

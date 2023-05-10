@@ -44,7 +44,7 @@
 - [x] Review de Jules
 - [ ] Rapport
 - [ ] Arpenteur
-  - [ ] Contraindre les mouvements
+  - [x] Contraindre les mouvements
   - [x] Improve camera
 - [ ] Modélisation
   - [x] Boids (Paperplane)
@@ -57,7 +57,8 @@
 - [x] Handle Material or texture
   - [ ] Improve cube texture (with mapped uv and stuff)
 - [ ] Instancing of draw calls
-- [ ] Option to display or not the shadows
+- [x] Option to display or not the shadows
+- [ ] Better ImGui
 - [ ] Obstacles :
     - [ ] Handle collisions
     - [ ] Handle creation (click)

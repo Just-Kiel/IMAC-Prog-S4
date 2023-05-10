@@ -11,6 +11,9 @@ ShadowMapping::ShadowMapping(std::array<std::string, 2> shaderPaths, const int& 
 
 void ShadowMapping::render(ModelsLOD& casterModel, const std::vector<ModelParams>& castersParams, const glm::mat4& ProjMatrix, const glm::mat4& lightSpaceMatrix)
 {
+    if (!m_displayShadow)
+        return;
+
     // Render to our framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, *m_framebuffer);
     glViewport(0, 0, m_framebuffer.getWidth(), m_framebuffer.getHeight()); // Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -35,6 +38,9 @@ void ShadowMapping::render(ModelsLOD& casterModel, const std::vector<ModelParams
 
 void ShadowMapping::activateTexture(const p6::Shader& shader) const
 {
+    if (!m_displayShadow)
+        return;
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_framebuffer.getTextureId());
     shader.set("shadowMap", 0);

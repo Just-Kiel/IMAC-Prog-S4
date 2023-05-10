@@ -20,6 +20,7 @@ uniform vec3 uLightIntensity;
 // Depth computed from light
 uniform vec3 uLightDir_vs;
 uniform sampler2D shadowMap;
+uniform bool uUseShadow;
 
 // Texture
 uniform bool uUseTexture;
@@ -81,8 +82,6 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     if(projCoords.z > 1.0)
         shadow = 0.0;
 
-
-
     return shadow;
 }
 
@@ -95,13 +94,14 @@ void main() {
     }	
 
     // calculate shadow
-    float shadow = ShadowCalculation(vFragPosLightSpace);     
-    // shadow = 0.0;  
+    float shadow = 0.0;
+    if (uUseShadow)
+        shadow = ShadowCalculation(vFragPosLightSpace);     
 
     // final color
     vec4 color = vec4(vColor, 1.0);
     if (uUseTexture)
-        color *= texture2D(uTexture, vTexCoords*4);
+        color *= texture(uTexture, vTexCoords);
 
     vec4 lighting = ((1.0 - shadow) *(ambient + vec4(lightRes,1.0)))* color;
 
