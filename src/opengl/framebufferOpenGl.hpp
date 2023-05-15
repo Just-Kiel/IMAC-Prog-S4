@@ -37,6 +37,8 @@ public:
         // Always check that our framebuffer is ok
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             assert(false);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     ~Framebuffer()
     {

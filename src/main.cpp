@@ -19,6 +19,7 @@
 #include "p6/p6.h"
 #include "perfs/perfs.hpp"
 #include "shadowMapping/shadowMapping.hpp"
+#include "skybox/skybox.hpp"
 
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
@@ -61,7 +62,7 @@ int main(int argc, char* argv[])
     };
 
     // Actual app
-    auto ctx = p6::Context{{.title = "Projecto con Olivia"}};
+    auto ctx = p6::Context{{.title = "Paperplane simulation"}};
     ctx.maximize_window();
 
     // Shaders initialization
@@ -95,6 +96,17 @@ int main(int argc, char* argv[])
     img::Image cellTex = p6::load_image_buffer("assets/textures/texture_cell.png");
     Texture    cellTexture{};
     cellTexture.image2D(static_cast<int>(cellTex.width()), static_cast<int>(cellTex.height()), cellTex.data(), GL_RGBA, GL_UNSIGNED_BYTE);
+
+    // CubeMap
+    Texture                 cubemapTexture{};
+    std::vector<img::Image> facesImg;
+    // cubemapTexture.cubemap(faces, GL_RGB, GL_UNSIGNED_BYTE);
+    p6::Shader skyboxShader = p6::load_shader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
+    VAO        skyboxVAO{};
+    VBO        skyboxVBO{};
+    createSkybox(cubemapTexture, facesImg, skyboxVAO, skyboxVBO);
+    skyboxShader.use();
+    skyboxShader.set("skybox", 0);
 
     // Camera
     FreeflyCamera camera;
@@ -270,6 +282,22 @@ int main(int argc, char* argv[])
             shadowMapping.activateTexture(shader);
             cellGlobal.drawModel(shader, ProjMatrix, ViewMatrix, cellParams);
             cellParams.scale = backupCellSize;
+        }
+
+        // Skybox
+        {
+            glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
+            skyboxShader.use();
+            auto view = glm::mat4(glm::mat3(camera.getViewMatrix())); // remove translation from the view matrix
+            skyboxShader.set("view", view);
+            skyboxShader.set("projection", ProjMatrix);
+            // skybox cube
+            glBindVertexArray(*skyboxVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, *cubemapTexture);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
+            glDepthFunc(GL_LESS); // set depth function back to default
         }
 
         // Camera controls

@@ -51,7 +51,8 @@
   - [ ] Arpenteur
   - [ ] Obstacles
 - [ ] Cube global environnement
-  - [ ] Cube Map ????
+  - [x] Cube Map ????
+  - [ ] HDRI exposure
 - [ ] Obstacles par défaut
 - [x] Shadow Mapping
 - [x] Handle Material or texture

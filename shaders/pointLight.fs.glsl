@@ -102,6 +102,8 @@ void main() {
     vec4 color = vec4(vColor, 1.0);
     if (uUseTexture)
         color *= texture(uTexture, vTexCoords);
+        if (color.a < 0.1)
+            discard ;
 
     vec4 lighting = ((1.0 - shadow) *(ambient + vec4(lightRes,1.0)))* color;
 
