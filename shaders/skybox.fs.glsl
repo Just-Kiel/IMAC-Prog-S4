@@ -5,7 +5,17 @@ in vec3 TexCoords;
 
 uniform samplerCube skybox;
 
+uniform float exposure;
+
 void main()
 {    
-    FragColor = texture(skybox, TexCoords);
+    const float gamma = 2.2;
+    vec3 hdrColor = texture(skybox, TexCoords).rgb;
+  
+    // exposure tone mapping
+    vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
+    // gamma correction 
+    mapped = pow(mapped, vec3(1.0 / gamma));
+  
+    FragColor = vec4(mapped, 1.0);
 }

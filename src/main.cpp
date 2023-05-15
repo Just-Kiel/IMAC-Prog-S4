@@ -107,6 +107,8 @@ int main(int argc, char* argv[])
     createSkybox(cubemapTexture, facesImg, skyboxVAO, skyboxVBO);
     skyboxShader.use();
     skyboxShader.set("skybox", 0);
+    float exposure = 1.f;
+    skyboxShader.set("exposure", exposure);
 
     // Camera
     FreeflyCamera camera;
@@ -167,7 +169,16 @@ int main(int argc, char* argv[])
                 ImGui::EndMenu();
             }
 
-            // TODO having 2 hdri and switch between them
+            // Skybox
+            if (ImGui::BeginMenu("Skybox"))
+            {
+                // Slider for exposure
+                if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 6.f))
+                {
+                    skyboxShader.set("exposure", exposure);
+                }
+                ImGui::EndMenu();
+            }
 
             // Camera
             cameraImgui(camera);

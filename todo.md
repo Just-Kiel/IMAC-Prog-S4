@@ -50,16 +50,16 @@
   - [x] Boids (Paperplane)
   - [ ] Arpenteur
   - [ ] Obstacles
-- [ ] Cube global environnement
+- [x] Cube global environnement
   - [x] Cube Map ????
-  - [ ] HDRI exposure
+  - [x] HDRI exposure
 - [ ] Obstacles par défaut
 - [x] Shadow Mapping
 - [x] Handle Material or texture
   - [x] Improve cube texture (with mapped uv and stuff)
 - [ ] Instancing of draw calls
 - [x] Option to display or not the shadows
-- [ ] Better ImGui
+- [x] Better ImGui
 - [ ] Obstacles :
     - [ ] Handle collisions
     - [ ] Handle creation (click)
