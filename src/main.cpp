@@ -42,6 +42,11 @@ std::vector<Boid> createBoids()
     return allBoids;
 }
 
+ModelParams computeArpenteurParams(glm::mat4 vMatrix)
+{
+    return make_model_params(vMatrix);
+}
+
 int main(int argc, char* argv[])
 {
     { // Run the tests
@@ -78,6 +83,9 @@ int main(int argc, char* argv[])
 
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
+
+    // Model initialization
+    Model arpenteur("assets/models/paperplane_low.obj");
 
     // Models initialization
     ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
@@ -211,10 +219,13 @@ int main(int argc, char* argv[])
         // Compute obstacles parameters for drawing model
         std::vector<ModelParams> paramsAllObstacles = computeObstaclesParams(allObstacles, cameraPos);
 
+        // Compute arpenteur for drawing model
+        ModelParams arpenteurParams = computeArpenteurParams(ViewMatrix);
+
         // Positions Lights
         std::array pointLightPositions = {
             glm::vec3(0.5f, 0.5f, 0.0f), // light that displays the shadow map
-            glm::vec3(-0.7f, -0.2f, -2.0f),
+            arpenteurParams.center,
         };
 
         const glm::vec3 lightDir = glm::vec3(0.f, -1.f, 0.2f);
@@ -275,6 +286,9 @@ int main(int argc, char* argv[])
         }
 
         boidPerformances.TimerDrawBoids();
+
+        // arpenteur drawing
+        arpenteur.drawModel(shader, ProjMatrix, ViewMatrix, arpenteurParams);
 
         for (auto const& obstacle : paramsAllObstacles)
         {

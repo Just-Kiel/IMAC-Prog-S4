@@ -4,6 +4,7 @@
 #include "LOD/LOD.hpp"
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
 #include "opengl/vao.hpp"
 #include "opengl/vbo.hpp"
 #include "p6/p6.h"
@@ -15,6 +16,9 @@ struct ModelParams {
     glm::vec3 direction;
     LOD       lod;
 };
+
+ModelParams make_model_params(glm::mat4& view);
+
 class Model {
 private:
     std::string            m_urlPath;
