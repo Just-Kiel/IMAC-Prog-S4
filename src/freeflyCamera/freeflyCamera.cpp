@@ -100,6 +100,16 @@ glm::mat4 FreeflyCamera::getViewMatrix() const
     return glm::lookAt(m_Position, m_Position + m_FrontVector, m_UpVector);
 }
 
+glm::vec3 FreeflyCamera::getPosition() const
+{
+    return m_Position;
+}
+
+glm::vec3 FreeflyCamera::getFrontVector() const
+{
+    return m_FrontVector;
+}
+
 void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime, float radiusCell)
 {
     if (ctx.key_is_pressed(GLFW_KEY_A) || ctx.key_is_pressed(GLFW_KEY_LEFT))

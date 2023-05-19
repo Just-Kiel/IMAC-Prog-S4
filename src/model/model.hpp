@@ -17,8 +17,6 @@ struct ModelParams {
     LOD       lod;
 };
 
-ModelParams make_model_params(glm::mat4& view);
-
 class Model {
 private:
     std::string            m_urlPath;

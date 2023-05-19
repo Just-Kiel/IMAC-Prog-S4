@@ -21,22 +21,6 @@ Model::Model(std::string urlPath)
     initModel();
 }
 
-ModelParams make_model_params(glm::mat4& view)
-{
-    glm::quat tempRot{};
-    glm::vec3 tempSkew{};
-    glm::vec4 perspective{};
-    glm::vec3 tempScale{};
-    glm::vec3 center{};
-
-    glm::decompose(view, tempScale, tempRot, center, tempSkew, perspective);
-
-    return ModelParams{
-        .center    = center,
-        .scale     = .2f,
-        .direction = glm::vec3(0, 0, 1)}; // tempRot[0], tempRot[1], tempRot[2]
-}
-
 void Model::loadObj()
 {
     std::vector<unsigned int> vertexIndices;

@@ -42,9 +42,13 @@ std::vector<Boid> createBoids()
     return allBoids;
 }
 
-ModelParams computeArpenteurParams(glm::mat4 vMatrix)
+ModelParams computeArpenteurParams(const glm::vec3& cameraPos, const glm::vec3& cameraDir)
 {
-    return make_model_params(vMatrix);
+    return ModelParams{
+        .center    = cameraPos,
+        .scale     = 0.5f,
+        .direction = cameraDir,
+    };
 }
 
 int main(int argc, char* argv[])
@@ -84,7 +88,7 @@ int main(int argc, char* argv[])
     // Models initialization
     ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
 
-    // Model initialization
+    // Model initialization arpenteur
     Model arpenteur("assets/models/paperplane_low.obj");
 
     // Models initialization
@@ -210,7 +214,8 @@ int main(int argc, char* argv[])
     ctx.update = [&]() {
         // For both shadow mapping and rendering
         const glm::mat4 ViewMatrix = camera.getViewMatrix();
-        const auto      cameraPos  = glm::vec3(ViewMatrix[3]);
+        const auto      cameraPos  = camera.getPosition();
+        const auto      cameraDir  = camera.getFrontVector();
         const glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
 
         // Compute boids parameters for drawing model
@@ -220,7 +225,7 @@ int main(int argc, char* argv[])
         std::vector<ModelParams> paramsAllObstacles = computeObstaclesParams(allObstacles, cameraPos);
 
         // Compute arpenteur for drawing model
-        ModelParams arpenteurParams = computeArpenteurParams(ViewMatrix);
+        ModelParams arpenteurParams = computeArpenteurParams(cameraPos, cameraDir);
 
         // Positions Lights
         std::array pointLightPositions = {

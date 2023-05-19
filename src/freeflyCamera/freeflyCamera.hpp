@@ -26,6 +26,8 @@ public:
     void rotateUp(float degrees);
 
     glm::mat4 getViewMatrix() const;
+    glm::vec3 getPosition() const;
+    glm::vec3 getFrontVector() const;
 
     void reset();
     void constraintCamera(float radius);
