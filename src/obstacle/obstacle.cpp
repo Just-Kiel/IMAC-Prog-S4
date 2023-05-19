@@ -33,23 +33,32 @@ glm::vec3 Obstacle::getPosition() const
     return m_position;
 }
 
-void addObstacle(p6::MouseButton& button, std::vector<Obstacle>& allObstacles)
+void addObstacle(const p6::Context& ctx, std::vector<Obstacle>& allObstacles, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const float& distanceToObstacle)
 {
     bool OnOtherObstacle = false;
-    if (button.button == p6::Button::Right)
+
+    if (ctx.mouse_button_is_pressed(p6::Button::Right))
     {
+        glm::vec2 mousePos = ctx.mouse();
+        mousePos.x *= ctx.inverse_aspect_ratio();
+
+        glm::mat4 invVP     = glm::inverse(projMatrix * viewMatrix);
+        glm::vec4 screenPos = glm::vec4(mousePos, distanceToObstacle, 1.0f);
+        glm::vec4 worldPos  = invVP * screenPos;
+
+        glm::vec3 worldPos3D = glm::vec3(worldPos) / worldPos.w;
+
         for (auto& obstacle : allObstacles)
         {
-            float dist = glm::distance(glm::vec2(obstacle.getPosition()), button.position);
-            if (dist <= 4 * obstacle.getRadius().value)
+            float dist = glm::distance(obstacle.getPosition(), worldPos3D);
+            if (dist <= 3 * obstacle.getRadius().value)
             {
                 OnOtherObstacle = true;
             }
         }
         if (!OnOtherObstacle)
         {
-            // TODO(Olivia) change in function cell size / view matrix
-            allObstacles.emplace_back(glm::vec3{-button.position.x, button.position.y, 0}, 0.1f);
+            allObstacles.emplace_back(worldPos3D, 0.1f);
         }
     }
 }
@@ -67,7 +76,7 @@ std::vector<ModelParams> computeObstaclesParams(const std::vector<Obstacle>& all
     return paramsAllObstacles;
 }
 
-void obstacleImgui(std::vector<Obstacle>& allObstacles)
+void obstacleImgui(std::vector<Obstacle>& allObstacles, float& distanceToObstacle)
 {
     if (ImGui::BeginMenu("Obstacles"))
     {
@@ -75,6 +84,8 @@ void obstacleImgui(std::vector<Obstacle>& allObstacles)
         {
             allObstacles.clear();
         }
+
+        ImGui::SliderFloat("Distance to Obstacle", &distanceToObstacle, -0.9f, 0.9f);
         ImGui::EndMenu();
     }
 }

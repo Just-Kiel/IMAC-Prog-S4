@@ -45,8 +45,8 @@ std::vector<Boid> createBoids()
 ModelParams computeArpenteurParams(const glm::vec3& cameraPos, const glm::vec3& cameraDir)
 {
     return ModelParams{
-        .center    = cameraPos,
-        .scale     = 0.5f,
+        .center    = cameraPos + 0.4f * cameraDir + glm::vec3(0.f, -0.2f, 0.f),
+        .scale     = 0.1f,
         .direction = cameraDir,
     };
 }
@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
 
     // Obstacles
     std::vector<Obstacle> allObstacles;
+    float                 obstacleDistanceFromCamera = 0.5f;
 
     // ImGui informations
     ctx.imgui = [&]() {
@@ -170,7 +171,7 @@ int main(int argc, char* argv[])
             }
 
             // Obstacles
-            obstacleImgui(allObstacles);
+            obstacleImgui(allObstacles, obstacleDistanceFromCamera);
 
             // Shadows
             if (ImGui::BeginMenu("Shadows"))
@@ -334,11 +335,11 @@ int main(int argc, char* argv[])
         {
             cameraKeyControls(ctx, camera, ctx.delta_time(), cellParams.scale + 0.9f * cellGap);
         }
-    };
 
-    // Obstacles controls
-    ctx.mouse_pressed = [&](p6::MouseButton button) {
-        addObstacle(button, allObstacles);
+        // Obstacles
+        {
+            addObstacle(ctx, allObstacles, ViewMatrix, ProjMatrix, obstacleDistanceFromCamera);
+        }
     };
 
     // Camera controls

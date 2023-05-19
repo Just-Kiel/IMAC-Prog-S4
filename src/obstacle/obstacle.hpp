@@ -24,6 +24,6 @@ public:
     glm::vec3 getPosition() const;
 };
 
-void                     addObstacle(p6::MouseButton& button, std::vector<Obstacle>& allObstacles);
+void                     addObstacle(const p6::Context& ctx, std::vector<Obstacle>& allObstacles, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const float& distanceToObstacle);
 std::vector<ModelParams> computeObstaclesParams(const std::vector<Obstacle>& allObstacles, const glm::vec3& viewMatrixPosition);
-void                     obstacleImgui(std::vector<Obstacle>& allObstacles);
+void                     obstacleImgui(std::vector<Obstacle>& allObstacles, float& distanceToObstacle);

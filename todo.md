@@ -61,5 +61,6 @@
 - [x] Option to display or not the shadows
 - [x] Better ImGui
 - [ ] Obstacles :
-    - [ ] Handle collisions
-    - [ ] Handle creation (click)
+    - [x] Handle collisions
+    - [x] Handle creation (click)
+    - [ ] Handle when going out of the cube
