@@ -46,7 +46,7 @@ ModelParams computeArpenteurParams(const glm::vec3& cameraPos, const glm::vec3& 
 {
     return ModelParams{
         .center    = cameraPos + 0.4f * cameraDir + glm::vec3(0.f, -0.2f, 0.f),
-        .scale     = 0.1f,
+        .scale     = 0.2f,
         .direction = cameraDir,
     };
 }
@@ -89,10 +89,10 @@ int main(int argc, char* argv[])
     ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
 
     // Model initialization arpenteur
-    Model arpenteur("assets/models/paperplane_low.obj");
+    Model arpenteur("assets/models/ufo.obj");
 
     // Models initialization
-    ModelsLOD modelObstacleLOD({"assets/models/sphere.obj", "assets/models/sphere.obj", "assets/models/sphere.obj"});
+    ModelsLOD modelObstacleLOD({"assets/models/asteroid_low.obj", "assets/models/asteroid_medium.obj", "assets/models/asteroid.obj"});
 
     // Model initialization
     Model cellGlobal("assets/models/cell.obj");
