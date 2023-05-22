@@ -26,7 +26,7 @@
 
 std::vector<Boid> createBoids()
 {
-    size_t nbBoids = 1;
+    size_t nbBoids = 50;
 
     // Boids init
     std::vector<Boid> allBoids;
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     }
 
     // Speed info
-    float  speed = 0.001f;
+    float  speed = 1.5f;
     Forces globalForces{
         .m_separationForce = 1.f,
         .m_cohesionForce   = 0.25f,

@@ -43,13 +43,13 @@
 # TO DO (19/04):
 - [x] Review de Jules
 - [ ] Rapport
-- [ ] Arpenteur
+- [x] Arpenteur
   - [x] Contraindre les mouvements
   - [x] Improve camera
-- [ ] Modélisation
+- [x] Modélisation
   - [x] Boids (Paperplane)
-  - [ ] Arpenteur
-  - [ ] Obstacles
+  - [x] Arpenteur
+  - [x] Obstacles
 - [x] Cube global environnement
   - [x] Cube Map ????
   - [x] HDRI exposure
