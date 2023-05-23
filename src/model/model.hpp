@@ -14,7 +14,7 @@ struct ModelParams {
     glm::vec3 center;
     float     scale;
     glm::vec3 direction;
-    LOD       lod;
+    LOD       lod{};
 };
 
 class Model {
