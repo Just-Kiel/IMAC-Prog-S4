@@ -57,7 +57,7 @@
 - [x] Shadow Mapping
 - [x] Handle Material or texture
   - [x] Improve cube texture (with mapped uv and stuff)
-- [ ] Instancing of draw calls
+- [x] Instancing of draw calls
 - [x] Option to display or not the shadows
 - [x] Better ImGui
 - [ ] Obstacles :

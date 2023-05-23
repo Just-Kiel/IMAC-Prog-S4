@@ -1,4 +1,5 @@
 #include "boid.hpp"
+#include <vcruntime.h>
 #include <vector>
 #include "boid/boid.hpp"
 #include "detections/detections.hpp"
@@ -158,13 +159,9 @@ void Boid::avoidObstacles(const std::vector<Obstacle>& allObs)
     // return other direction if there is something
     for (auto const& obs : allObs)
     {
-        /*
-        glm::intersectLineSphere(m_centered_coord, m_direction, obs.getPosition(), obs.getRadius(), obs.getPosition()-m_centered_coord,glm::normalize(obs.getPosition()-m_centered_coord));
-        */
         float vecLengthCenters = glm::l2Norm(obs.getPosition(), m_centered_coord);
         if (vecLengthCenters < obs.getRadius().value)
         {
-            // TODO(Aurore): Find a way to avoid the obstacle better because for the moment it's not working perfectly
             m_direction = glm::vec3(p6::rotated_by(p6::Angle(m_direction) + 25_degrees, glm::vec2(1., 0.)), 0.);
         }
     }
@@ -218,11 +215,11 @@ void Boid::rotateDown()
 
 void ImguiBoids(std::vector<Boid>& boids)
 {
-    unsigned int nbBoids = boids.size();
-    float        radius  = nbBoids != 0 ? boids[0].radius() : 0.01f;
+    size_t nbBoids = boids.size();
+    float  radius  = nbBoids != 0 ? boids[0].radius() : 0.01f;
 
-    unsigned int minNbBoids = 0;
-    unsigned int maxNbBoids = 500;
+    size_t minNbBoids = 0;
+    size_t maxNbBoids = 500;
 
     if (ImGui::SliderScalar("Boids number", ImGuiDataType_U32, &nbBoids, &minNbBoids, &maxNbBoids, "%u", ImGuiSliderFlags_AlwaysClamp))
     {
