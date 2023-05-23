@@ -26,8 +26,20 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}\build --config Debug --target ${{env.TARGET}}
 
-    - name: Run
-      run: ${{github.workspace}}\build\Debug\${{env.TARGET}} -nogpu
+    # - name: Run
+    #   run: ${{github.workspace}}\build\Debug\${{env.TARGET}} -nogpu
+
+    - name: Look for github workspace
+      run: ls ${{github.workspace}}
+
+    - name: Look for build folder
+      run: ls ${{github.workspace}}/build
+
+    - name: Look for Debug folder
+      run: ls ${{github.workspace}}/build/Debug
+
+    - name: Look for bin folder
+      run: ls ${{github.workspace}}/bin
 
 #-----------------------------------------------------------------------------------------------
   Windows_MSVC_Release:

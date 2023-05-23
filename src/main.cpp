@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
             {
                 ImGui::Text("If this is checked, the boids and obstacles will be drawn with instancing and no LOD will be used.");
 
-                ImGui::Text("");
+                ImGui::NewLine();
 
                 // Checkbox for instancing
                 ImGui::Checkbox("Instancing", &instancing);

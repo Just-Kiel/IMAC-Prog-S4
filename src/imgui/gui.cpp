@@ -8,7 +8,8 @@ void ImguiControls()
         ImGui::Text("Controls:");
         ImGui::Text("- Left click to add an obstacle");
 
-        ImGui::Text("");
+        // Jump a line to separate the two texts not with empty string text
+        ImGui::NewLine();
 
         ImGui::Text("- Drag the mouse to rotate the camera");
         ImGui::Text("- Use the arrows to move the camera or classics WASD (QZSD)");
@@ -25,13 +26,13 @@ void ImguiCredits()
         ImGui::Text("- Olivia CREPIN");
         ImGui::Text("- Aurore LAFAURIE");
 
-        ImGui::Text("");
+        ImGui::NewLine();
 
         ImGui::Text("With the help of:");
         ImGui::Text("- Enguerrand DE SMET");
         ImGui::Text("- Jules FOUCHY");
 
-        ImGui::Text("");
+        ImGui::NewLine();
 
         ImGui::Text("Project made during the fourth semester at the IMAC engineering school.");
         ImGui::EndMenu();
