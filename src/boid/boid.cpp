@@ -1,5 +1,4 @@
 #include "boid.hpp"
-#include <vcruntime.h>
 #include <vector>
 #include "boid/boid.hpp"
 #include "detections/detections.hpp"

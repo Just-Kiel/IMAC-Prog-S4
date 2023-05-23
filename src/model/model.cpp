@@ -1,6 +1,4 @@
 #include "model/model.hpp"
-#include <vcruntime.h>
-#include <vcruntime_string.h>
 #include <fstream>
 #include <string>
 #include "LOD/LOD.hpp"

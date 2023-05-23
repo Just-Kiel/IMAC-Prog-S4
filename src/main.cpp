@@ -282,6 +282,8 @@ int main(int argc, char* argv[])
         const glm::mat4 lightProjection  = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4       lightSpaceMatrix = lightProjection * lightView;
 
+        boidPerformances.startTimer();
+
         if (!instancing)
         {
             shadowMapping.render(modelBoidsLOD, paramsAllBoids, ProjMatrix, lightSpaceMatrix);
@@ -290,6 +292,8 @@ int main(int argc, char* argv[])
         {
             shadowMapping.render(modelBoids, paramsAllBoids, vboInstancedBoids, ProjMatrix, lightSpaceMatrix);
         }
+
+        boidPerformances.TimerShadowBoids();
 
         // Rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
