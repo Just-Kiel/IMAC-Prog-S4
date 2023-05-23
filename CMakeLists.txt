@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # ---Choose project name---
-project(Prog-S4)
+project(IMAC-Boids-2023)
 
 # ---Declare source files---
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*)

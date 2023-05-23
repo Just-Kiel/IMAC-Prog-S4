@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 env:
-  TARGET: Prog-S4 # Should be the name of the target you created in your CMakeLists.txt and want to build and run
+  TARGET: IMAC-Boids-2023 # Should be the name of the target you created in your CMakeLists.txt and want to build and run
 
 jobs:
 #-----------------------------------------------------------------------------------------------
