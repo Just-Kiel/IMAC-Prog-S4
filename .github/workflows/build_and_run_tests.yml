@@ -41,6 +41,9 @@ jobs:
     - name: Look for bin folder
       run: ls ${{github.workspace}}/bin
 
+    - name: Look for Debug folder
+      run: ls ${{github.workspace}}/bin/${{env.TARGET}}
+
 #-----------------------------------------------------------------------------------------------
   Windows_MSVC_Release:
     name: Windows MSVC Release
