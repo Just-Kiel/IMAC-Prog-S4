@@ -17,6 +17,7 @@ public:
     explicit ShadowMapping(std::array<std::string, 2> shaderPaths, const int& width, const int& height);
 
     void render(ModelsLOD& casterModel, const std::vector<ModelParams>& castersParams, const glm::mat4& ProjMatrix, const glm::mat4& lightSpaceMatrix);
+    void render(Model& casterModel, const std::vector<ModelParams>& castersParams, const VBO& vboInstancing, const glm::mat4& ProjMatrix, const glm::mat4& lightSpaceMatrix);
 
     void activateTexture(const p6::Shader& shader) const;
 };

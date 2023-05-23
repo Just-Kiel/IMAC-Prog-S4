@@ -1,6 +1,9 @@
 #include "model/model.hpp"
+#include <vcruntime.h>
+#include <vcruntime_string.h>
 #include <fstream>
 #include <string>
+#include "LOD/LOD.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -239,5 +242,47 @@ void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, con
 
     glBindVertexArray(*m_vao);
     glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_outVertices.size()));
+    glBindVertexArray(0);
+}
+
+void Model::initModelInstancing(const VBO& vboInstancing)
+{
+    glBindVertexArray(*m_vao);
+
+    const GLuint VERTEX_ATTR_CENTER    = 4;
+    const GLuint VERTEX_ATTR_SCALE     = 5;
+    const GLuint VERTEX_ATTR_DIRECTION = 6;
+    glEnableVertexAttribArray(VERTEX_ATTR_CENTER);
+    glEnableVertexAttribArray(VERTEX_ATTR_SCALE);
+    glEnableVertexAttribArray(VERTEX_ATTR_DIRECTION);
+
+    // Specification
+    glBindBuffer(GL_ARRAY_BUFFER, *vboInstancing);
+    glVertexAttribPointer(VERTEX_ATTR_CENTER, 3, GL_FLOAT, GL_FALSE, sizeof(ModelParams), nullptr);
+
+    glVertexAttribPointer(VERTEX_ATTR_SCALE, 1, GL_FLOAT, GL_FALSE, sizeof(ModelParams), (const GLvoid*)(offsetof(ModelParams, scale)));
+
+    glVertexAttribPointer(VERTEX_ATTR_DIRECTION, 3, GL_FLOAT, GL_FALSE, sizeof(ModelParams), (const GLvoid*)(offsetof(ModelParams, direction)));
+
+    glVertexAttribDivisor(VERTEX_ATTR_CENTER, 1);
+    glVertexAttribDivisor(VERTEX_ATTR_SCALE, 1);
+    glVertexAttribDivisor(VERTEX_ATTR_DIRECTION, 1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void Model::drawInstancedModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const std::vector<ModelParams>& paramsAllBoids, const VBO& vboInstancedBoids)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, *vboInstancedBoids);
+    glBufferData(GL_ARRAY_BUFFER, paramsAllBoids.size() * sizeof(ModelParams), paramsAllBoids.data(), GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Set uniforms
+    shader.set("uProjectionMatrix", ProjMatrix);
+    shader.set("uViewMatrix", view);
+
+    glBindVertexArray(*m_vao);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(m_outVertices.size()), static_cast<GLsizei>(paramsAllBoids.size()));
     glBindVertexArray(0);
 }

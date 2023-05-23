@@ -1,6 +1,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <random>
+#include <string>
 #include <vector>
 #include "LOD/LOD.hpp"
 #include "boid/boid.hpp"
@@ -85,14 +86,8 @@ int main(int argc, char* argv[])
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Models initialization
-    ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
-
     // Model initialization arpenteur
     Model arpenteur("assets/models/ufo.obj");
-
-    // Models initialization
-    ModelsLOD modelObstacleLOD({"assets/models/asteroid_low.obj", "assets/models/asteroid_medium.obj", "assets/models/asteroid.obj"});
 
     // Model initialization
     Model cellGlobal("assets/models/cell.obj");
@@ -112,10 +107,9 @@ int main(int argc, char* argv[])
     // CubeMap
     Texture                 cubemapTexture{};
     std::vector<img::Image> facesImg;
-    // cubemapTexture.cubemap(faces, GL_RGB, GL_UNSIGNED_BYTE);
-    p6::Shader skyboxShader = p6::load_shader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
-    VAO        skyboxVAO{};
-    VBO        skyboxVBO{};
+    p6::Shader              skyboxShader = p6::load_shader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
+    VAO                     skyboxVAO{};
+    VBO                     skyboxVBO{};
     createSkybox(cubemapTexture, facesImg, skyboxVAO, skyboxVBO);
     skyboxShader.use();
     skyboxShader.set("skybox", 0);
@@ -133,9 +127,42 @@ int main(int argc, char* argv[])
     Perfs             boidPerformances{};
     static bool       showBoidsWindow = false;
 
+    // Models initialization with LOD and no instancing
+    ModelsLOD modelBoidsLOD({"assets/models/paperplane_low.obj", "assets/models/paperplane_medium.obj", "assets/models/paperplane_high.obj"});
+
+    static bool instancing = true;
+    VBO         vboInstancedBoids{};
+    p6::Shader  instancedShader = p6::load_shader("shaders/instancing.vs.glsl", "shaders/pointLight.fs.glsl");
+    Model       modelBoids("assets/models/paperplane_high.obj");
+
     // Obstacles
     std::vector<Obstacle> allObstacles;
     float                 obstacleDistanceFromCamera = 0.5f;
+    // Models initialization
+    ModelsLOD modelObstacleLOD({"assets/models/asteroid_low.obj", "assets/models/asteroid_medium.obj", "assets/models/asteroid.obj"});
+
+    VBO   vboInstancedObstacles{};
+    Model modelObstacle("assets/models/asteroid.obj");
+
+    {
+        // Instanced binding
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, *vboInstancedBoids);
+            glBufferData(GL_ARRAY_BUFFER, allBoids.size() * sizeof(ModelParams), nullptr, GL_STREAM_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+
+        modelBoids.initModelInstancing(vboInstancedBoids);
+
+        // Instanced binding
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, *vboInstancedObstacles);
+            glBufferData(GL_ARRAY_BUFFER, allObstacles.size() * sizeof(ModelParams), nullptr, GL_STREAM_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+
+        modelObstacle.initModelInstancing(vboInstancedObstacles);
+    }
 
     // ImGui informations
     ctx.imgui = [&]() {
@@ -182,6 +209,19 @@ int main(int argc, char* argv[])
                 ImGui::EndMenu();
             }
 
+            // Instancing
+            if (ImGui::BeginMenu("Instancing"))
+            {
+                ImGui::Text("If this is checked, the boids and obstacles will be drawn with instancing and no LOD will be used.");
+
+                ImGui::Text("");
+
+                // Checkbox for instancing
+                ImGui::Checkbox("Instancing", &instancing);
+
+                ImGui::EndMenu();
+            }
+
             // Skybox
             if (ImGui::BeginMenu("Skybox"))
             {
@@ -223,7 +263,7 @@ int main(int argc, char* argv[])
         const std::vector<ModelParams> paramsAllBoids = computeBoidsParams(allBoids, cameraPos);
 
         // Compute obstacles parameters for drawing model
-        std::vector<ModelParams> paramsAllObstacles = computeObstaclesParams(allObstacles, cameraPos);
+        const std::vector<ModelParams> paramsAllObstacles = computeObstaclesParams(allObstacles, cameraPos);
 
         // Compute arpenteur for drawing model
         ModelParams arpenteurParams = computeArpenteurParams(cameraPos, cameraDir);
@@ -241,10 +281,26 @@ int main(int argc, char* argv[])
 
         const glm::mat4 lightProjection  = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4       lightSpaceMatrix = lightProjection * lightView;
-        shadowMapping.render(modelBoidsLOD, paramsAllBoids, ProjMatrix, lightSpaceMatrix);
+
+        if (!instancing)
+        {
+            shadowMapping.render(modelBoidsLOD, paramsAllBoids, ProjMatrix, lightSpaceMatrix);
+        }
+        else
+        {
+            shadowMapping.render(modelBoids, paramsAllBoids, vboInstancedBoids, ProjMatrix, lightSpaceMatrix);
+        }
 
         // Rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (instancing)
+        {
+            instancedShader.use();
+            instancedShader.set("uUseShadow", shadowMapping.m_displayShadow);
+            instancedShader.set("uUseTexture", false);
+            instancedShader.set("uLightSpaceMatrix", lightSpaceMatrix);
+        }
+
         shader.use();
         shader.set("uUseShadow", shadowMapping.m_displayShadow);
         shader.set("uUseTexture", false);
@@ -285,21 +341,44 @@ int main(int argc, char* argv[])
 
         boidPerformances.startTimer();
 
-        for (auto const& boid : paramsAllBoids)
+        // Boids drawing
+        if (instancing)
+        {
+            shadowMapping.activateTexture(instancedShader);
+            instancedShader.use();
+
+            modelBoids.drawInstancedModel(instancedShader, ProjMatrix, ViewMatrix, paramsAllBoids, vboInstancedBoids);
+        }
+        else
         {
             shadowMapping.activateTexture(shader);
-            modelBoidsLOD.drawModel(shader, ProjMatrix, ViewMatrix, boid);
+            shader.use();
+            for (auto const& boid : paramsAllBoids)
+            {
+                modelBoidsLOD.drawModel(shader, ProjMatrix, ViewMatrix, boid);
+            }
         }
 
         boidPerformances.TimerDrawBoids();
 
-        // arpenteur drawing
+        // Arpenteur drawing
         arpenteur.drawModel(shader, ProjMatrix, ViewMatrix, arpenteurParams);
 
-        for (auto const& obstacle : paramsAllObstacles)
+        // Obstacles drawing
+        if (instancing)
+        {
+            shadowMapping.activateTexture(instancedShader);
+            instancedShader.use();
+
+            modelObstacle.drawInstancedModel(instancedShader, ProjMatrix, ViewMatrix, paramsAllObstacles, vboInstancedObstacles);
+        }
+        else
         {
             shadowMapping.activateTexture(shader);
-            modelObstacleLOD.drawModel(shader, ProjMatrix, ViewMatrix, obstacle);
+            for (auto const& obstacle : paramsAllObstacles)
+            {
+                modelObstacleLOD.drawModel(shader, ProjMatrix, ViewMatrix, obstacle);
+            }
         }
 
         {

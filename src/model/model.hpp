@@ -36,6 +36,8 @@ public:
 
     void loadObj();
     void initModel();
+    void initModelInstancing(const VBO& vboInstancing);
 
     void drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params);
+    void drawInstancedModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const std::vector<ModelParams>& paramsAllBoids, const VBO& vboInstancedBoids);
 };

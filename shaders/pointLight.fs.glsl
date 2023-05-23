@@ -87,7 +87,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 void main() {
     // lighting
-    vec4 ambient = vec4(0.2);
+    vec4 ambient = vec4(0.4, 0.5, 0.4, 1.);
     vec3 lightRes = vec3(0.0);
     for(int i = 0; i < NB_LIGHTS; i++){
         lightRes += blinnPhong(u_lightsPos[i]);

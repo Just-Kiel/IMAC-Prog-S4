@@ -1,8 +1,9 @@
 #pragma once
+#include <cstdint>
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
 
-enum LOD {
+enum LOD : int {
     LOD_LOW,
     LOD_MEDIUM,
     LOD_HIGH,

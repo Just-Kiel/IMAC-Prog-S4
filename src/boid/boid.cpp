@@ -256,7 +256,7 @@ void ImguiBoids(std::vector<Boid>& boids)
 
 std::vector<ModelParams> computeBoidsParams(const std::vector<Boid>& allBoids, const glm::vec3& viewMatrixPosition)
 {
-    std::vector<ModelParams> paramsAllBoids{allBoids.size()};
+    std::vector<ModelParams> paramsAllBoids{};
     for (auto const& boid : allBoids)
     {
         ModelParams params = boid.computeParams();
