@@ -59,7 +59,7 @@ void ImguiStartSimulationWindow(bool& startSimulation, float& speedBoids)
     if (startSimulation)
     {
         // Make a closable window to start the simulation
-        ImGui::Begin("Paperplane and asteroids simulation", &startSimulation, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Paperplane and asteroids simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
         // Center the window
         ImGui::SetWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowSize().x / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowSize().y / 2));
