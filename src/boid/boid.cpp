@@ -28,13 +28,13 @@ ModelParams Boid::computeParams() const
 void Boid::updateCenter(const float& speed, const Forces& forces, const std::vector<Boid>& neighbors)
 {
     // Add cohesion process
-    m_direction += this->cohesion(neighbors) * forces.m_cohesionForce * speed;
+    m_direction += this->cohesion(neighbors) * forces.cohesionForce * speed;
 
     // Add separation process
-    m_direction += this->separation(neighbors) * speed * forces.m_separationForce;
+    m_direction += this->separation(neighbors) * speed * forces.separationForce;
 
     // Add alignment process
-    m_direction += this->alignment(neighbors) * speed * forces.m_alignmentForce;
+    m_direction += this->alignment(neighbors) * speed * forces.alignmentForce;
 
     // Limit the speed
     m_direction = glm::normalize(m_direction);
@@ -65,7 +65,7 @@ glm::vec3 Boid::separation(const std::vector<Boid>& neighbors)
         // Difference in term of position not length
         glm::vec3 difference = this->m_centered_coord - boid.m_centered_coord;
 
-        glm::vec3 move = glm::normalize(difference) / static_cast<float>(difference.length());
+        glm::vec3 move = glm::normalize(difference) / static_cast<float>(glm::vec3::length());
 
         total += move;
         count++;
@@ -210,6 +210,24 @@ void Boid::rotateUp()
 void Boid::rotateDown()
 {
     m_direction = glm::rotate(m_direction, glm::radians(-15.f), {1, 0, 0});
+}
+
+std::vector<Boid> createBoids()
+{
+    size_t nbBoids = 50;
+
+    // Boids init
+    std::vector<Boid> allBoids;
+
+    for (size_t i = 0; i < nbBoids; ++i)
+    {
+        allBoids.emplace_back(
+            glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
+            0.01f
+        );
+    }
+
+    return allBoids;
 }
 
 void ImguiBoids(std::vector<Boid>& boids)

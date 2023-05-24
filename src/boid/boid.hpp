@@ -47,5 +47,6 @@ public:
     void rotateDown();
 };
 
+std::vector<Boid>        createBoids();
 void                     ImguiBoids(std::vector<Boid>& boids);
 std::vector<ModelParams> computeBoidsParams(const std::vector<Boid>& allBoids, const glm::vec3& viewMatrixPosition);

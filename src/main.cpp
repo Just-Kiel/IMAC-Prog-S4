@@ -25,24 +25,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "doctest/doctest.h"
 
-std::vector<Boid> createBoids()
-{
-    size_t nbBoids = 50;
-
-    // Boids init
-    std::vector<Boid> allBoids;
-
-    for (size_t i = 0; i < nbBoids; ++i)
-    {
-        allBoids.emplace_back(
-            glm::vec3(p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f), p6::random::number(-1.f, 1.f)),
-            0.01f
-        );
-    }
-
-    return allBoids;
-}
-
 ModelParams computeArpenteurParams(const glm::vec3& cameraPos, const glm::vec3& cameraDir)
 {
     return ModelParams{
@@ -66,9 +48,9 @@ int main(int argc, char* argv[])
     // Speed info
     float  speed = 1.5f;
     Forces globalForces{
-        .m_separationForce = 1.f,
-        .m_cohesionForce   = 0.25f,
-        .m_alignmentForce  = 1.f,
+        .separationForce = 1.f,
+        .cohesionForce   = 0.25f,
+        .alignmentForce  = 1.f,
     };
 
     // Actual app
@@ -78,7 +60,6 @@ int main(int argc, char* argv[])
     // Shaders initialization
     const p6::Shader shader = p6::load_shader(
         "shaders/3D.vs.glsl",
-        //"shaders/normals.fs.glsl"
         "shaders/pointLight.fs.glsl"
     );
 
@@ -90,14 +71,12 @@ int main(int argc, char* argv[])
     Model arpenteur("assets/models/ufo.obj");
 
     // Model initialization
-    Model cellGlobal("assets/models/cell.obj");
-
+    Model       cellGlobal("assets/models/cell.obj");
     ModelParams cellParams{
         .center    = glm::vec3(0, 0, 0),
         .scale     = 1.f,
         .direction = glm::vec3(1, 0, 0),
     };
-
     float cellGap = 1.5f;
 
     img::Image cellTex = p6::load_image_buffer("assets/textures/texture_cell.png");
@@ -107,7 +86,7 @@ int main(int argc, char* argv[])
     // CubeMap
     Texture                 cubemapTexture{};
     std::vector<img::Image> facesImg;
-    p6::Shader              skyboxShader = p6::load_shader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
+    const p6::Shader        skyboxShader = p6::load_shader("shaders/skybox.vs.glsl", "shaders/skybox.fs.glsl");
     VAO                     skyboxVAO{};
     VBO                     skyboxVBO{};
     createSkybox(cubemapTexture, facesImg, skyboxVAO, skyboxVBO);
@@ -148,7 +127,7 @@ int main(int argc, char* argv[])
         // Instanced binding
         {
             glBindBuffer(GL_ARRAY_BUFFER, *vboInstancedBoids);
-            glBufferData(GL_ARRAY_BUFFER, allBoids.size() * sizeof(ModelParams), nullptr, GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(allBoids.size() * sizeof(ModelParams)), nullptr, GL_STREAM_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
 
@@ -157,7 +136,7 @@ int main(int argc, char* argv[])
         // Instanced binding
         {
             glBindBuffer(GL_ARRAY_BUFFER, *vboInstancedObstacles);
-            glBufferData(GL_ARRAY_BUFFER, allObstacles.size() * sizeof(ModelParams), nullptr, GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(allObstacles.size() * sizeof(ModelParams)), nullptr, GL_STREAM_DRAW);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
 
@@ -201,37 +180,13 @@ int main(int argc, char* argv[])
             obstacleImgui(allObstacles, obstacleDistanceFromCamera);
 
             // Shadows
-            if (ImGui::BeginMenu("Shadows"))
-            {
-                // Checkboxes for shadows
-                ImGui::Checkbox("Display shadows", &shadowMapping.m_displayShadow);
-
-                ImGui::EndMenu();
-            }
+            shadowMappingImgui(shadowMapping.m_displayShadow);
 
             // Instancing
-            if (ImGui::BeginMenu("Instancing"))
-            {
-                ImGui::Text("If this is checked, the boids and obstacles will be drawn with instancing and no LOD will be used.");
-
-                ImGui::NewLine();
-
-                // Checkbox for instancing
-                ImGui::Checkbox("Instancing", &instancing);
-
-                ImGui::EndMenu();
-            }
+            ImguiInstancing(instancing);
 
             // Skybox
-            if (ImGui::BeginMenu("Skybox"))
-            {
-                // Slider for exposure
-                if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 6.f))
-                {
-                    skyboxShader.set("exposure", exposure);
-                }
-                ImGui::EndMenu();
-            }
+            skyboxImgui(exposure, skyboxShader);
 
             // Camera
             cameraImgui(camera);
@@ -325,6 +280,7 @@ int main(int argc, char* argv[])
 
         boidPerformances.startTimer();
 
+        // Boids update
         for (auto& boid : allBoids)
         {
             Forces tempForces = globalForces;
@@ -332,9 +288,9 @@ int main(int argc, char* argv[])
             if (boid.avoidWalls(cellParams.scale))
             {
                 globalForces = Forces{
-                    .m_separationForce = 0.f,
-                    .m_cohesionForce   = 0.f,
-                    .m_alignmentForce  = 0.f,
+                    .separationForce = 0.f,
+                    .cohesionForce   = 0.f,
+                    .alignmentForce  = 0.f,
                 };
             }
             boid.updateCenter(speed, globalForces, allBoids);
@@ -416,10 +372,10 @@ int main(int argc, char* argv[])
 
         // Camera controls
         {
-            cameraKeyControls(ctx, camera, ctx.delta_time(), cellParams.scale + 0.9f * cellGap);
+            cameraKeyControls(ctx, camera, cellParams.scale + 0.9f * cellGap);
         }
 
-        // Obstacles
+        // Obstacles controls
         {
             addObstacle(ctx, allObstacles, ViewMatrix, ProjMatrix, obstacleDistanceFromCamera);
         }

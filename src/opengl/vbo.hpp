@@ -3,7 +3,7 @@
 
 class VBO {
 private:
-    GLuint m_id;
+    GLuint m_id{};
 
 public:
     VBO()

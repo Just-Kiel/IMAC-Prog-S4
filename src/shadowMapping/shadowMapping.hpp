@@ -21,3 +21,5 @@ public:
 
     void activateTexture(const p6::Shader& shader) const;
 };
+
+void shadowMappingImgui(bool& displayShadow);

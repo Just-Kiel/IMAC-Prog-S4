@@ -9,10 +9,8 @@
 #include "obstacle/obstacle.hpp"
 
 Obstacle::Obstacle(glm::vec3 position, float radius)
-    : m_position(position), m_radius(radius)
-{
-    m_direction = glm::vec3(1, 0, 0);
-}
+    : m_position(position), m_direction(glm::vec3(1, 0, 0)), m_radius(radius)
+{}
 
 ModelParams Obstacle::computeParams() const
 {

@@ -110,8 +110,9 @@ glm::vec3 FreeflyCamera::getFrontVector() const
     return m_FrontVector;
 }
 
-void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime, float radiusCell)
+void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float radiusCell)
 {
+    float deltaTime = ctx.delta_time();
     if (ctx.key_is_pressed(GLFW_KEY_A) || ctx.key_is_pressed(GLFW_KEY_LEFT))
     {
         camera.moveLeft(deltaTime);

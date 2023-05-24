@@ -3,7 +3,7 @@
 
 class Texture {
 private:
-    GLuint m_id;
+    GLuint m_id{};
 
 public:
     Texture()
@@ -37,7 +37,7 @@ public:
     void image2D(const int& width, const int& height, const void* data, const GLenum& format, const GLenum& type) const
     {
         glBindTexture(GL_TEXTURE_2D, m_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, type, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(format), width, height, 0, format, type, data);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -50,7 +50,7 @@ public:
 
         for (unsigned int i = 0; i < 6; ++i)
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, static_cast<int>(data[i].width()), static_cast<int>(data[i].height()), 0, format, type, data[i].data());
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, static_cast<GLint>(format), static_cast<int>(data[i].width()), static_cast<int>(data[i].height()), 0, format, type, data[i].data());
         }
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

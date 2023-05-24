@@ -1,7 +1,7 @@
 #include "skybox.hpp"
 #include <array>
 
-std::array skyboxVertices = {
+const std::array skyboxVertices = {
     // positions
     -1.0f, 1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
@@ -68,4 +68,17 @@ void createSkybox(Texture& cubemapTexture, std::vector<img::Image>& facesImg, co
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+}
+
+void skyboxImgui(float& exposure, const p6::Shader& skyboxShader)
+{
+    if (ImGui::BeginMenu("Skybox"))
+    {
+        // Slider for exposure
+        if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 6.f))
+        {
+            skyboxShader.set("exposure", exposure);
+        }
+        ImGui::EndMenu();
+    }
 }

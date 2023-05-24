@@ -5,12 +5,12 @@
 
 class Framebuffer {
 private:
-    GLuint m_id;
+    GLuint m_id{};
 
     Texture m_depth_buffer{};
 
-    int m_width;
-    int m_height;
+    int m_width{};
+    int m_height{};
 
 public:
     Framebuffer(const int& width, const int& height)

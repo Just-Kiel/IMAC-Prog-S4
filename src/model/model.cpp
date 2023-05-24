@@ -22,18 +22,10 @@ Model::Model(std::string urlPath)
     initModel();
 }
 
-void Model::loadObj()
+void parseObjFile(const std::string& urlPath, std::vector<glm::vec3>& tempVertices, std::vector<glm::vec2>& tempUvs, std::vector<glm::vec3>& tempNormals, std::vector<glm::vec3>& tempColors, std::vector<unsigned int>& vertexIndices, std::vector<unsigned int>& uvIndices, std::vector<unsigned int>& normalIndices)
 {
-    std::vector<unsigned int> vertexIndices;
-    std::vector<unsigned int> uvIndices;
-    std::vector<unsigned int> normalIndices;
-    std::vector<glm::vec3>    tempVertices;
-    std::vector<glm::vec3>    tempColors;
-    std::vector<glm::vec2>    tempUvs;
-    std::vector<glm::vec3>    tempNormals;
-
     std::ifstream file;
-    file.open(p6::make_absolute_path(m_urlPath), std::ios_base::in);
+    file.open(p6::make_absolute_path(urlPath), std::ios_base::in);
     if (!file.is_open())
     {
         std::cout << "Impossible to open the file !\n";
@@ -87,9 +79,9 @@ void Model::loadObj()
         }
         else if (lineHeader == "f")
         {
-            unsigned int vertexIndex[3];
-            unsigned int uvIndex[3];
-            unsigned int normalIndex[3];
+            std::array<unsigned int, 3> vertexIndex{};
+            std::array<unsigned int, 3> uvIndex{};
+            std::array<unsigned int, 3> normalIndex{};
 
             file.ignore(1);
             file >> vertexIndex[0];
@@ -128,6 +120,20 @@ void Model::loadObj()
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
+}
+
+void Model::loadObj()
+{
+    std::vector<unsigned int> vertexIndices;
+    std::vector<unsigned int> uvIndices;
+    std::vector<unsigned int> normalIndices;
+    std::vector<glm::vec3>    tempVertices;
+    std::vector<glm::vec3>    tempColors;
+    std::vector<glm::vec2>    tempUvs;
+    std::vector<glm::vec3>    tempNormals;
+
+    // Parse obj file
+    parseObjFile(m_urlPath, tempVertices, tempUvs, tempNormals, tempColors, vertexIndices, uvIndices, normalIndices);
 
     // For each vertex of each triangle
     for (unsigned int vertexIndex : vertexIndices)
@@ -167,16 +173,16 @@ void Model::loadObj()
 void Model::initModel()
 {
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboPositions);
-    glBufferData(GL_ARRAY_BUFFER, m_outVertices.size() * sizeof(glm::vec3), m_outVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m_outVertices.size() * sizeof(glm::vec3)), m_outVertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboNormals);
-    glBufferData(GL_ARRAY_BUFFER, m_outNormals.size() * sizeof(glm::vec3), m_outNormals.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m_outNormals.size() * sizeof(glm::vec3)), m_outNormals.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboTexCoords);
-    glBufferData(GL_ARRAY_BUFFER, m_outUvs.size() * sizeof(glm::vec2), m_outUvs.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m_outUvs.size() * sizeof(glm::vec2)), m_outUvs.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, *m_vboColors);
-    glBufferData(GL_ARRAY_BUFFER, m_outColors.size() * sizeof(glm::vec3), m_outColors.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m_outColors.size() * sizeof(glm::vec3)), m_outColors.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(*m_vao);
@@ -209,7 +215,9 @@ void Model::initModel()
 void Model::drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params)
 {
     // Rotate the model to the correct direction
-    glm::vec3 frontAxis, leftAxis, upAxis;
+    glm::vec3 frontAxis;
+    glm::vec3 leftAxis;
+    glm::vec3 upAxis;
 
     computeDirectionVectors(frontAxis, leftAxis, upAxis, params.direction);
 
@@ -273,7 +281,7 @@ void Model::initModelInstancing(const VBO& vboInstancing)
 void Model::drawInstancedModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const std::vector<ModelParams>& paramsAllBoids, const VBO& vboInstancedBoids)
 {
     glBindBuffer(GL_ARRAY_BUFFER, *vboInstancedBoids);
-    glBufferData(GL_ARRAY_BUFFER, paramsAllBoids.size() * sizeof(ModelParams), paramsAllBoids.data(), GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(paramsAllBoids.size() * sizeof(ModelParams)), paramsAllBoids.data(), GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Set uniforms

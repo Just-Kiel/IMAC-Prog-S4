@@ -13,5 +13,5 @@ struct Perfs {
     void TimerDrawBoids();
     void TimerShadowBoids();
 
-    void ImGui();
+    void ImGui() const;
 };

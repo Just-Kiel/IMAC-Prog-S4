@@ -33,5 +33,5 @@ public:
     void constraintCamera(float radius);
 };
 
-void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float deltaTime, float radiusCell);
+void cameraKeyControls(const p6::Context& ctx, FreeflyCamera& camera, float radiusCell);
 void cameraImgui(FreeflyCamera& camera);

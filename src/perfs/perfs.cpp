@@ -21,7 +21,7 @@ void Perfs::TimerShadowBoids()
     m_elapsed_shadow_boids_seconds = std::chrono::system_clock::now() - m_start_before_counting;
 }
 
-void Perfs::ImGui()
+void Perfs::ImGui() const
 {
     ImGui::Text("Elapsed compute boids time: %fms", m_elapsed_compute_boids_seconds.count() * 1000.0);
 

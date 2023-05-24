@@ -4,3 +4,5 @@
 #include "opengl/vbo.hpp"
 
 void createSkybox(Texture& cubemapTexture, std::vector<img::Image>& facesImg, const VAO& skyboxVAO, const VBO& skyboxVBO);
+
+void skyboxImgui(float& exposure, const p6::Shader& skyboxShader);

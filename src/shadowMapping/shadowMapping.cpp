@@ -71,3 +71,14 @@ void ShadowMapping::activateTexture(const p6::Shader& shader) const
     glBindTexture(GL_TEXTURE_2D, m_framebuffer.getTextureId());
     shader.set("shadowMap", 0);
 }
+
+void shadowMappingImgui(bool& displayShadow)
+{
+    if (ImGui::BeginMenu("Shadows"))
+    {
+        // Checkboxes for shadows
+        ImGui::Checkbox("Display shadows", &displayShadow);
+
+        ImGui::EndMenu();
+    }
+}

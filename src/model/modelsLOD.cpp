@@ -2,11 +2,11 @@
 #include <numeric>
 #include "LOD/LOD.hpp"
 
-ModelsLOD::ModelsLOD(std::array<std::string, LOD_COUNT> modelsPaths)
+ModelsLOD::ModelsLOD(const std::array<std::string, LOD_COUNT>& modelsPaths)
 {
-    for (int i = 0; i < LOD_COUNT; i++)
+    for (const auto& path : modelsPaths)
     {
-        m_models.emplace_back(modelsPaths[i]);
+        m_models.emplace_back(path);
     }
 }
 

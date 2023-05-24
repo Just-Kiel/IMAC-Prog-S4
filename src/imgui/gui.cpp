@@ -38,3 +38,18 @@ void ImguiCredits()
         ImGui::EndMenu();
     }
 }
+
+void ImguiInstancing(bool& instancing)
+{
+    if (ImGui::BeginMenu("Instancing"))
+    {
+        ImGui::Text("If this is checked, the boids and obstacles will be drawn with instancing and no LOD will be used.");
+
+        ImGui::NewLine();
+
+        // Checkbox for instancing
+        ImGui::Checkbox("Instancing", &instancing);
+
+        ImGui::EndMenu();
+    }
+}

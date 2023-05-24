@@ -41,3 +41,5 @@ public:
     void drawModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const ModelParams& params);
     void drawInstancedModel(const p6::Shader& shader, const glm::mat4& ProjMatrix, const glm::mat4& view, const std::vector<ModelParams>& paramsAllBoids, const VBO& vboInstancedBoids);
 };
+
+void parseObjFile(const std::string& urlPath, std::vector<glm::vec3>& tempVertices, std::vector<glm::vec2>& tempUvs, std::vector<glm::vec3>& tempNormals, std::vector<glm::vec3>& tempColors, std::vector<unsigned int>& vertexIndices, std::vector<unsigned int>& uvIndices, std::vector<unsigned int>& normalIndices);
