@@ -53,3 +53,37 @@ void ImguiInstancing(bool& instancing)
         ImGui::EndMenu();
     }
 }
+
+void ImguiStartSimulationWindow(bool& startSimulation, float& speedBoids)
+{
+    if (startSimulation)
+    {
+        // Make a closable window to start the simulation
+        ImGui::Begin("Paperplane and asteroids simulation", &startSimulation, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+        // Center the window
+        ImGui::SetWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowSize().x / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowSize().y / 2));
+
+        // Text to present the simulation
+        // Center the text
+        ImGui::SetCursorPosX(ImGui::GetWindowSize().x / 2 - ImGui::CalcTextSize("Welcome to the paperplane and asteroids simulation !").x / 2);
+        ImGui::Text("Welcome to the paperplane and asteroids simulation !");
+
+        ImGui::NewLine();
+
+        ImGui::Text("This simulation is made with OpenGL and C++.");
+        ImGui::Text("You can find the controls in the Help menu.");
+        ImGui::Text("You can also find a lot of more parameters changeable and details in the top menu.");
+
+        // Button to start the simulation
+        // Center the button
+        ImGui::SetCursorPosX(ImGui::GetWindowSize().x / 2 - ImGui::CalcTextSize("Start simulation").x / 2);
+        if (ImGui::Button("Start simulation"))
+        {
+            speedBoids      = 1.0f;
+            startSimulation = false;
+        }
+
+        ImGui::End();
+    }
+}

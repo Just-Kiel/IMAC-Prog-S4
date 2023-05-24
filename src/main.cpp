@@ -1,3 +1,4 @@
+#include <math.h>
 #include <chrono>
 #include <cstdlib>
 #include <random>
@@ -45,8 +46,10 @@ int main(int argc, char* argv[])
             return EXIT_SUCCESS;
     }
 
+    static bool startSimulationWindow = true;
+
     // Speed info
-    float  speed = 1.5f;
+    float  speed = 0.0f;
     Forces globalForces{
         .separationForce = 1.f,
         .cohesionForce   = 0.25f,
@@ -145,10 +148,15 @@ int main(int argc, char* argv[])
 
     // ImGui informations
     ctx.imgui = [&]() {
-        // Show another simple window, this time using an explicit Begin/End pair
-        ImGui::Begin("Cell zone");
-        ImGui::SliderFloat("Cell radius", &cellParams.scale, 1.f, 5.f);
-        ImGui::End();
+        ImguiStartSimulationWindow(startSimulationWindow, speed);
+
+        // Cell zone
+        if (!startSimulationWindow)
+        {
+            ImGui::Begin("Cell zone");
+            ImGui::SliderFloat("Cell radius", &cellParams.scale, 1.f, 5.f);
+            ImGui::End();
+        }
 
         if (showBoidsWindow)
         {
@@ -371,11 +379,13 @@ int main(int argc, char* argv[])
         }
 
         // Camera controls
+        if (!startSimulationWindow)
         {
             cameraKeyControls(ctx, camera, cellParams.scale + 0.9f * cellGap);
         }
 
         // Obstacles controls
+        if (!startSimulationWindow)
         {
             addObstacle(ctx, allObstacles, ViewMatrix, ProjMatrix, obstacleDistanceFromCamera);
         }
