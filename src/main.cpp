@@ -266,6 +266,19 @@ int main(int argc, char* argv[])
             instancedShader.set("uUseShadow", shadowMapping.m_displayShadow);
             instancedShader.set("uUseTexture", false);
             instancedShader.set("uLightSpaceMatrix", lightSpaceMatrix);
+
+            // lighting (material)
+            instancedShader.set("uKd", glm::vec3{0.9f, 0.8f, 0.9f});
+            instancedShader.set("uKs", glm::vec3{0.2f, 0.3f, 0.2f});
+            instancedShader.set("uShininess", 100.f);
+
+            // lighting (light)
+            instancedShader.set("uLightIntensity", glm::vec3{1.f, 1.f, 1.f});
+
+            // point light 1
+            instancedShader.set("u_lightsPos[0]", pointLightPositions[0]);
+            // point light 2
+            instancedShader.set("u_lightsPos[1]", pointLightPositions[1]);
         }
 
         shader.use();

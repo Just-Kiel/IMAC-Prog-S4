@@ -287,6 +287,7 @@ void Model::drawInstancedModel(const p6::Shader& shader, const glm::mat4& ProjMa
     // Set uniforms
     shader.set("uProjectionMatrix", ProjMatrix);
     shader.set("uViewMatrix", view);
+    shader.set("uIsInstanced", true);
 
     glBindVertexArray(*m_vao);
     glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(m_outVertices.size()), static_cast<GLsizei>(paramsAllBoids.size()));

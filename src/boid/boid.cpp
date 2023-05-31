@@ -236,7 +236,7 @@ void ImguiBoids(std::vector<Boid>& boids)
     float  radius  = nbBoids != 0 ? boids[0].radius() : 0.01f;
 
     size_t minNbBoids = 0;
-    size_t maxNbBoids = 500;
+    size_t maxNbBoids = 1000;
 
     if (ImGui::SliderScalar("Boids number", ImGuiDataType_U32, &nbBoids, &minNbBoids, &maxNbBoids, "%u", ImGuiSliderFlags_AlwaysClamp))
     {
