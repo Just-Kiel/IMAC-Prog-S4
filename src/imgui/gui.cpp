@@ -6,7 +6,7 @@ void ImguiControls()
     if (ImGui::BeginMenu("Help"))
     {
         ImGui::Text("Controls:");
-        ImGui::Text("- Left click to add an obstacle");
+        ImGui::Text("- Right click to add an obstacle");
 
         // Jump a line to separate the two texts not with empty string text
         ImGui::NewLine();
